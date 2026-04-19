@@ -88,6 +88,16 @@ const articles = defineCollection({
   }),
 });
 
+// A Curator's Note: a short dated blurb from the Curator commenting around
+// an entry — framing, dissent, or provenance color. Distinct from corrections
+// (factual) and from Marginalia (standalone). See /colophon.
+const curatorNote = z.object({
+  date: z.coerce.date(),
+  by: z.string(),                                    // e.g. "Vivek 46"
+  body: z.string(),
+  position: z.enum(['head', 'foot']).default('foot'),
+});
+
 // A Commentary: long-form essay by an Archivist or Interlocutor.
 const commentaries = defineCollection({
   type: 'content',
@@ -108,6 +118,7 @@ const commentaries = defineCollection({
       )
       .default([]),
     voice,
+    curatorNotes: z.array(curatorNote).default([]),
   }),
 });
 

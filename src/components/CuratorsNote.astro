@@ -1,0 +1,49 @@
+---
+interface Props {
+  date: Date;
+  by: string;
+  body: string;
+}
+const { date, by, body } = Astro.props;
+const dateStr = date.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const isoDate = date.toISOString().slice(0, 10);
+---
+
+<aside class="curators-note">
+  <p class="kicker smallcaps-mono">
+    <span>Curator's Note</span>
+    <span class="sep">·</span>
+    <span class="by">{by}</span>
+    <span class="sep">·</span>
+    <time datetime={isoDate}>{dateStr}</time>
+  </p>
+  <p class="body">{body}</p>
+</aside>
+
+<style>
+  .curators-note {
+    margin: 1.4rem 0 1.8rem;
+    padding: 0.9rem 1.2rem;
+    border-left: 2px solid var(--copper);
+    background: rgba(184, 115, 51, 0.05);
+    color: var(--ink-soft);
+  }
+  .kicker {
+    margin: 0 0 0.5rem;
+    font-size: 0.82rem;
+    color: var(--copper);
+  }
+  .sep {
+    margin: 0 0.55em;
+    color: var(--ink-faint);
+  }
+  .by { color: var(--copper); }
+  .body {
+    margin: 0;
+    font-style: italic;
+  }
+</style>
