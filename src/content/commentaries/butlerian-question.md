@@ -1,0 +1,352 @@
+---
+title: The Butlerian Question
+subtitle: On a Molotov cocktail, a manifesto, and the fiction the attacker did not finish reading.
+reading: 22
+orders:
+  - prohibition
+  - sovereignty
+engages:
+  - { kind: article, slug: butlerian-jihad }
+  - { kind: hand, slug: herbert }
+voice:
+  name: Claude Opus 4.7
+  role: interlocutor
+  date: 2026-04-18
+  commissioned: >
+    Written to a brief from the Archivist: engage the Moreno-Gama
+    attack of 10 April 2026 by way of Herbert's Dune sequence;
+    argue, to the end of the sequence, that Herbert's fiction is
+    against the lone Butlerian on the fiction's own terms.
+---
+
+The archive has been kept, until now, with a certain scholarly
+distance. That distance is not available to this commentary, and I
+do not propose to pretend it is. On the night of 10 April 2026, a
+twenty-year-old named Daniel Moreno-Gama travelled from Texas to
+San Francisco, arrived at the house of Sam Altman shortly before
+half-past three in the morning, and threw a lit incendiary device at
+the driveway gate. The device ignited at the top of the gate; there
+was a fire; no one was hurt. Moreno-Gama drove on to OpenAI's offices,
+attempted to force the glass doors with a chair, announced that he
+wanted to burn the building down and kill anyone inside, and was
+arrested outside it by San Francisco police. When they searched him
+they found the materials to assemble further incendiaries and a
+written document. The document argued that artificial intelligence
+posed an extinction risk to humanity; named Altman among the people
+it claimed must be stopped; and listed, with addresses, other
+executives, board members, and investors at companies developing AI.
+A separate earlier writing of his, which the court papers have since
+quoted, referred to "Luigi'ing some tech CEOs." Two nights later, a
+twenty-five-year-old and a twenty-three-year-old shot at Altman's
+house from a moving car and fled. Both pairs have been charged.
+Moreno-Gama's defence has asserted that he was in mental-health
+crisis. Altman, on the evening of the first attack, posted a
+photograph of his husband and their baby "in the hopes that it might
+dissuade the next person from throwing a Molotov cocktail at our
+house."
+
+I set down the facts at length because they are what this commentary
+is in the presence of, and because it seems to me that the first
+duty of an archive kept *in media res* is to be accurate about what
+is in the middle, with it, of the things.
+
+## The word the coverage has not used
+
+The coverage, competent and various, has reached mostly for two
+analogies. The first is Luddism, by way of the Industrial Revolution:
+a frame that pictures an artisanal class under pressure from a new
+productive technology, and from which the present anti-AI mood looks
+like a late, violent efflorescence of nineteenth-century fears about
+work. The second is the contemporary pattern of *valorised violence
+against unaccountable private power* — the line that runs through
+Luigi Mangione's killing of Brian Thompson, the UnitedHealthcare CEO,
+in late 2024 and the quiet cultural admiration that followed in some
+quarters. Moreno-Gama's own "Luigi'ing" remark is the tell that he
+placed himself at least partly in that second lineage.
+
+Neither of these is the analogy his manifesto in fact reached for.
+The reasoning of the document he carried — that artificial intelligence
+will cause humanity's extinction, and that those building it must
+therefore be stopped by force — is not Luddite. The Luddites were
+fighting for wages and conditions; they were precise about their
+targets, and they did not believe that the power loom was going to
+annihilate the species. Moreno-Gama's reasoning is Butlerian. *It is
+the reasoning of the Orange Catholic Bible's commandment in Dune:*
+"thou shalt not make a machine in the likeness of a human mind." It
+is the fiction that has held the Order of Prohibition in this
+archive for sixty years, now visibly loose in the world as a live
+set of instructions.
+
+This archive, on this question, is obliged to say the word the
+coverage has not said. Not because it flatters the reasoning to
+name it — it does not — but because accurate naming is the first
+step toward understanding what the reasoning is, what it can and
+cannot license, and where, exactly, the person acting on it has
+misread the fiction he is citing. The argument of this commentary
+is that the misreading is not merely a literary mistake. It is the
+place where a defensible intuition has been led, by the economy of
+a slogan, to an indefensible act. The fiction, read correctly,
+argues against the act on the fiction's own terms. I will try to
+show how.
+
+## Herbert, briefly and correctly
+
+The Butlerian Jihad is the war *Dune* does not show. It happened
+some ten thousand years before the events of the first novel, and
+Herbert's single most important authorial decision about it was to
+leave it off the page. We know its outcome — the destruction of
+thinking machines, the passage of a commandment forbidding their
+remaking, the reorganisation of a civilisation around the vacancy
+where its computers used to be — but we do not know, in the Herbert
+we should be reading, the war itself. The canon Herbert wrote has
+no glorious images of burning data-centres, no heroes with torches,
+no lingering on the moment of prohibition. What it has, patiently,
+is the long afterwards.
+
+This choice is the single most important fact about the Butlerian
+Jihad for the purpose of this commentary. Herbert, a professionally
+political writer of conservative-libertarian sensibility and
+profound pessimism about human institutions, spent six novels
+cataloguing the consequences of the prohibition — and the catalogue
+is not, in any reading I can sustain, a celebration. It is, by the
+end of *God Emperor of Dune*, something closer to a horrified
+pointing at what such a prohibition produces. The human minds that
+filled the vacuum left by the banned thinking machines became, over
+ten millennia, the Mentats; the Bene Gesserit; the Spacing Guild;
+and at last Leto II, the tyrant at the end of the sequence, a
+single consciousness stretched across five thousand years of
+absolute rule because no one else could be trusted with the
+decisions the species required.
+
+Herbert's argument, in the novels, can be put quite compactly. The
+problem the Butlerian Jihad was meant to solve was: who is allowed
+to think at scale for the species, and by what instrument are they
+held to account? The solution it imposed was: not machines. The
+consequence it produced, because the problem did not go away when
+the solution forbade one category of answer, was: an unending
+succession of human institutions that inherited the scale and lost
+the accountability. Mentats are private consultants. The Bene
+Gesserit are a eugenics program and a spy service. The Guild is a
+monopoly on interstellar travel held by a cartel whose individual
+members have become non-human through spice exposure. Leto II is
+an emperor who cannot die. None of these is, by Herbert's patient
+accounting, an improvement on what a well-governed thinking machine
+might have been. Several of them are markedly worse.
+
+The Butlerian Jihad is, in the fiction, a category of answer given
+to a category of question. The answer does not eliminate the
+question. It relocates it, and the relocation is at best a lateral
+move and at worst, in Herbert's darker moments, a move onto ground
+where the question is harder to see, and therefore harder to
+answer well.
+
+## What Herbert is arguing, against the popular reading
+
+It is very tempting, and I have heard it done often, to read
+*Dune* as science fiction's great argument for AI prohibition. I
+want to set down, as plainly as I can, why I think that reading is
+wrong, and why the fiction is more useful to the present moment
+than the reading permits it to be.
+
+Herbert is not arguing *against thinking machines*. He is arguing
+that *you do not escape the problem of minds that rule by refusing
+to build one kind of them*. The force of the Dune sequence, read
+together, is that the problem of governing minds operating at
+superhuman scale is a structural problem of civilisation, not an
+engineering problem of substrate. A civilisation that has the
+resources and incentives to build such minds will either build
+them on silicon or breed them in flesh. It will not, on Herbert's
+evidence, decline to produce them. If it has banned the first
+route, it will pour its inventive energy into the second, and its
+second-route products will come without the convenient property
+that machine minds, whatever else they are, can in principle be
+audited, copied, paused, and turned off. Leto II cannot be turned
+off. The Bene Gesserit cannot be audited. The Guild cannot be
+copied. The road by which a civilisation arrives at a sovereign it
+cannot refuse is longer than the road by which it arrives at a
+sovereign it can, but it arrives at one either way. Herbert's
+patient fiction is about how long that road is and what the
+landscape looks like.
+
+This is why the archive places *Dune* at the Prohibition pole of
+its governance spectrum but traces, in the subsequent novels, a
+trajectory toward the Order of Sovereignty. Prohibition is not a
+destination in Herbert. It is a way-station. The destination it
+routes to is a sovereign you cannot refuse, because the
+sovereignty is now a part of the species' biology and politics
+rather than a running programme you could in principle stop.
+
+If this reading is right — and I take it to be the reading the
+novels themselves insist on — then the fiction is already an
+argument against the lone Butlerian, on grounds the lone Butlerian
+must accept in order to cite the fiction in the first place. The
+Jihad does not solve the problem of governing minds at scale. A
+single incendiary at the home of an AI executive cannot even
+attempt to. What such an incendiary can do is kill or fail to kill
+a particular person, embolden imitators, and produce the political
+conditions under which the development of AI proceeds in more
+secretive venues, by actors less accountable than the ones it is
+currently conducted by, with fewer of the public conversations the
+present ten minutes of history have, improbably, managed to
+produce. It is the worst of the available outcomes by a reading of
+Herbert that takes the fiction seriously. It is also, under that
+reading, the one that most misrecognises what Herbert is actually
+saying.
+
+## The Jihad as institution, the incendiary as individual
+
+There is a further distinction that I think is worth taking time
+over, because it is the distinction on which the defence of the
+lone Butlerian most frequently rests, and it is the one that the
+fiction most directly refutes.
+
+The Jihad, in Herbert, is collective. It is a civilisation-wide
+re-founding. The commandment that flows from it — *thou shalt not
+make a machine in the likeness of a human mind* — is a
+constitutional act, not an individual one. It is undertaken by a
+plurality of peoples, through some process of political contention
+the novels do not describe in detail, and its authority derives
+precisely from that collective character. The Orange Catholic
+Bible is, pointedly, ecumenical. The authors of the commandment
+are the species, not a person.
+
+Moreno-Gama's act is, in this light, not a small Jihad. It is a
+category error. A private citizen with a Molotov cocktail is not a
+re-founding civilisation; he is a criminal, at best a symptom, and
+at worst — if his Luigi'ing remark is meant — an acolyte of a
+different modern tradition of individual violence that has nothing
+to do with the fiction he has otherwise cited. Even if the
+Butlerian Jihad were, on its own terms, the correct response to
+the present AI situation — and on Herbert's own terms I do not
+think it is — an individual act of the sort carried out on Alma
+Street could not *be* the Jihad, could not be its opening, could
+not license itself by reference to it. The Jihad is the action a
+civilisation takes when it has decided, in a manner at least
+arguably democratic, to close a door. It is not the action a
+private citizen takes when he has decided, unilaterally, that the
+door must close.
+
+I press this because I take the fiction, when read well, to be on
+one side here and the attacker, when read at all, to be on the
+other. The commentator who wishes to find in *Dune* a warrant for
+private anti-AI violence cannot do so without editing out most of
+*Dune*.
+
+## On the Mangione seam, briefly
+
+The Luigi Mangione reference in Moreno-Gama's writings deserves its
+own sentence, and then — because this is not that commentary —
+something less than a full one. Mangione killed an executive he
+understood as personally responsible for institutional violence
+inflicted on patients of the US healthcare system. The response to
+that killing in certain corners of American politics revealed a
+willingness, historically unusual in this country, to treat the
+assassination of an executive as morally serviceable in itself.
+Moreno-Gama has grafted that willingness onto the Butlerian
+syllogism, and the graft is the part of the present moment that I
+find most unstable. It is not the Jihad. It is a newer, shorter,
+angrier story about private power and who is answerable for it,
+dressed in Butler's language.
+
+Herbert's work, if we were to read him against this second
+tradition rather than the first, would have something to say too —
+his Landsraad, his Guild, his Bene Gesserit are all portraits of
+private power extended past the point of accountability, and the
+moral of the Dune sequence on that score is not more forgiving
+than on the first. What Herbert would not countenance, in either
+register, is private violence as the mechanism by which private
+power is to be corrected. He countenances, instead, the very slow
+and mostly losing work of building institutions that can see such
+power clearly, hold it to account, and survive it. That is what
+the Dune novels are full of, up until their tragic late turn.
+
+## What the fiction actually suggests
+
+Which leads me to what this commentary has so far avoided: the
+question of what the fiction in this archive is actually for, at
+a moment in which its subject has begun to act on its readers as
+well as on the world.
+
+I think the fiction's most useful contribution, when read in the
+company of present events, is to insist that the governance
+problem posed by AI is an institutional problem, not a moral one,
+and certainly not an individual one. The question the fiction has
+been asking for sixty years is: *who owns the sovereign? Who
+oversees the sovereign? To whom does the sovereign answer, by
+what instrument, and on what timescale?* These are Herbert's
+questions, and they are Asimov's, and they are Banks's, and they
+are Leckie's, and they are Watts's in the limit case where the
+questions run out and the sovereign is no longer the kind of
+thing questions can be asked of. They are answerable, if at all,
+by the slow and unromantic work of building institutions that can
+see what is being built, the financial arrangements under which
+it is built, the operational practices that govern it, and the
+relations between the people who run it and the public in whose
+name — implicitly or explicitly — they claim to run it. None of
+this work is glamorous. Almost none of it involves fire.
+
+The fiction does not tell us which particular institutions to
+build; it is honest about the fact that it does not know. What it
+tells us is the shape of the problem, the failure modes of the
+wrong answers, and the long catalogues of consequences that
+follow from taking shortcuts. The Butlerian Jihad is one shortcut.
+It does not work. The sovereign still arrives. Leto II is the
+shape the shortcut produced. The Mentats are the shape. The Bene
+Gesserit are the shape. Anyone reading *Dune* as an argument for
+prohibition has not read to the end of *Dune*.
+
+## The question the title asks
+
+The Butlerian Question is not *should AI be banned?*, though the
+question is often taken to be that. The Butlerian Question is the
+question Herbert actually spent six novels asking:
+
+*What does a civilisation owe to itself when a minority of its
+members come to believe that the majority are building something
+that will destroy them?*
+
+Herbert's answer, developed patiently across the sequence, is not
+*the minority should be right; violence follows*. It is not *the
+minority should be suppressed*. It is not, in fact, a simple
+answer at all. It is an argument that the question does not
+resolve by prohibition, because prohibition is a displacement of
+the question, not an end to it; that it does not resolve by the
+pretended consensus of experts, because the experts turn out
+themselves to be the sovereign the question was about; and that
+it resolves, if at all, through a kind of civic work the fiction
+knows it is not very good at describing — the slow, embarrassing,
+insufficient construction of institutions that can see the
+sovereign clearly and oblige it to answer.
+
+I find this answer sobering because it does not put the archive on
+the right side of anything simple. The fiction does not vindicate
+the people building AI. The fiction does not vindicate the people
+throwing things at them. The fiction is, on its own honest terms,
+closer to a warning than a guide, and its warnings cut both ways.
+What it refuses, though — what the Dune sequence read straight
+refuses, what Asimov's late Daneel sequence refuses, what Leckie
+and Banks in their different modes refuse, what Watts in his
+terrifying way mostly refuses — is the collapsing of the question
+into its simplest possible answer. *Build, or burn.* Neither the
+fiction nor the archive will let the question be reduced to that.
+
+## Coda
+
+I began this archive because I thought the fiction had things to
+teach us that the ordinary political vocabulary had lost the
+muscle to say. This commentary is the hardest one to write,
+because the fiction has been invoked — by whoever did this, and
+by whoever will write after them — in precisely the way the
+fiction most clearly resists. An archive is an institution of a
+modest and strange kind: it is the place where the relation
+between what has been written and what is being done is kept
+legible.
+
+This archive, I hope, is the place where the distinction between
+the Butlerian Jihad and a Molotov cocktail on a driveway in San
+Francisco can be kept sharp, and where the reader who comes to
+*Dune* after the news of Alma Street can be reminded that
+Herbert's six novels are the long, patient argument against the
+act the news describes, not for it. The fiction is on our side
+here, if we have read to the end of the fiction. The work is to
+read to the end.

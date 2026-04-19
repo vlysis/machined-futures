@@ -1,0 +1,111 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderChip from '~/components/OrderChip.astro';
+import VoiceByline from '~/components/VoiceByline.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const items = await getCollection('commentaries');
+  return items.map((c) => ({ params: { slug: c.slug }, props: { item: c } }));
+}
+
+const { item } = Astro.props;
+const { Content } = await item.render();
+
+const collectionOf = {
+  hand: 'hands',
+  dossier: 'dossiers',
+  article: 'articles',
+} as const;
+
+const engages = await Promise.all(
+  item.data.engages.map(async (ref) => {
+    const entry = await getEntry(collectionOf[ref.kind], ref.slug).catch(() => null);
+    return { ref, entry };
+  })
+);
+
+function labelOf(entry: any): string {
+  if (!entry) return '';
+  return entry.data.name ?? entry.data.title ?? entry.slug;
+}
+
+const dateStr = item.data.voice.date.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<Base title={item.data.title} description={item.data.subtitle ?? undefined}>
+  <article class="prose">
+    <p class="entry-eyebrow">
+      <span class="smallcaps-mono">The Archive · Commentary</span>
+      <span class="smallcaps-mono" style="color: var(--rubric);">
+        <time datetime={item.data.voice.date.toISOString().slice(0, 10)}>{dateStr}</time>
+      </span>
+    </p>
+    <h1 class="entry-title">{item.data.title}</h1>
+    {item.data.subtitle && <p class="commentary-sub">{item.data.subtitle}</p>}
+    <VoiceByline voice={item.data.voice} />
+
+    {(item.data.orders.length > 0 || engages.length > 0) && (
+      <dl class="entry-meta">
+        {item.data.orders.length > 0 && (
+          <>
+            <dt>Orders</dt>
+            <dd class="meta-orders">
+              {item.data.orders.map((o) => <OrderChip order={o} />)}
+            </dd>
+          </>
+        )}
+        {engages.length > 0 && (
+          <>
+            <dt>Engages</dt>
+            <dd>
+              {engages
+                .filter(({ entry }) => entry !== null)
+                .map(({ ref, entry }, i) => (
+                  <>
+                    {i > 0 ? ' · ' : ''}
+                    <a href={`/${collectionOf[ref.kind]}/${ref.slug}`}>{labelOf(entry)}</a>
+                  </>
+                ))}
+            </dd>
+          </>
+        )}
+      </dl>
+    )}
+
+    <hr class="rule-decorated"><span>✦</span></hr>
+
+    <div class="commentary-prose">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .commentary-sub {
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.15rem;
+    margin: -0.6rem 0 0.8rem;
+  }
+  .byline {
+    color: var(--ink-faint);
+    margin-bottom: 1.2rem;
+  }
+  .meta-orders { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .commentary-prose :global(h2) {
+    margin-top: 2.6em;
+  }
+  .commentary-prose :global(h2)::before {
+    content: '';
+    display: block;
+    width: 3rem;
+    height: 1px;
+    background: var(--copper);
+    margin-bottom: 0.9em;
+  }
+</style>

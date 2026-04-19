@@ -1,0 +1,107 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderChip from '~/components/OrderChip.astro';
+import VoiceByline from '~/components/VoiceByline.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const items = await getCollection('marginalia');
+  return items.map((m) => ({ params: { slug: m.slug }, props: { item: m } }));
+}
+
+const { item } = Astro.props;
+const { Content } = await item.render();
+
+const collectionOf = {
+  hand: 'hands',
+  dossier: 'dossiers',
+  article: 'articles',
+} as const;
+
+const margins = await Promise.all(
+  item.data.inMarginOf.map(async (ref) => {
+    const entry = await getEntry(collectionOf[ref.kind], ref.slug).catch(
+      () => null
+    );
+    return { ref, entry };
+  })
+);
+
+function labelOf(entry: any): string {
+  if (!entry) return '';
+  return entry.data.name ?? entry.data.title ?? entry.slug;
+}
+
+const dateStr = item.data.date.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<Base title={item.data.title} description={item.data.summary}>
+  <article class="prose">
+    <p class="entry-eyebrow">
+      <span class="smallcaps-mono">The Archive · Marginalium</span>
+      <span class="smallcaps-mono" style="color: var(--rubric);">
+        <time datetime={item.data.date.toISOString().slice(0, 10)}>{dateStr}</time>
+      </span>
+    </p>
+    <h1 class="entry-title">{item.data.title}</h1>
+    <p class="entry-epigraph">{item.data.summary}</p>
+
+    <dl class="entry-meta">
+      <dt>In the margin of</dt>
+      <dd>
+        {margins
+          .filter(({ entry }) => entry !== null)
+          .map(({ ref, entry }, i) => (
+            <>
+              {i > 0 ? ' · ' : ''}
+              <a href={`/${collectionOf[ref.kind]}/${ref.slug}`}>{labelOf(entry)}</a>
+            </>
+          ))}
+      </dd>
+      {item.data.orders.length > 0 && (
+        <>
+          <dt>Orders</dt>
+          <dd class="meta-orders">
+            {item.data.orders.map((o) => <OrderChip order={o} />)}
+          </dd>
+        </>
+      )}
+      {item.data.expandedBy && (
+        <>
+          <dt>Expanded by</dt>
+          <dd>
+            <a href={`/commentaries/${item.data.expandedBy.slug}`}>
+              Commentary &rsaquo;
+            </a>
+          </dd>
+        </>
+      )}
+    </dl>
+
+    <VoiceByline voice={item.data.voice} />
+
+    <div class="marginalium-prose">
+      <Content />
+    </div>
+
+    <p class="marginalium-note">
+      <a href="/marginalia">&lsaquo; all marginalia</a>
+    </p>
+  </article>
+</Base>
+
+<style>
+  .meta-orders { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .marginalium-note {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+  }
+</style>

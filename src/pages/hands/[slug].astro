@@ -1,0 +1,129 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderChip from '~/components/OrderChip.astro';
+import OrderSigil from '~/components/OrderSigil.astro';
+import VoiceByline from '~/components/VoiceByline.astro';
+import { getCollection } from 'astro:content';
+import { ORDERS } from '~/lib/orders';
+
+export async function getStaticPaths() {
+  const hands = await getCollection('hands');
+  return hands.map((hand) => ({ params: { slug: hand.slug }, props: { hand } }));
+}
+
+const { hand } = Astro.props;
+const { Content } = await hand.render();
+
+// Find all dossiers written in this hand.
+const dossiers = (await getCollection('dossiers'))
+  .filter((d) => d.data.hand.slug === hand.slug)
+  .sort((a, b) => (a.data.year ?? 0) - (b.data.year ?? 0));
+
+const primary = hand.data.primaryOrders[0];
+const accent = ORDERS[primary].accent;
+---
+
+<Base title={hand.data.name} description={hand.data.summary}>
+  <article class="prose" style={`--accent: ${accent};`}>
+    <p class="entry-eyebrow">
+      <span class="smallcaps-mono">The Archive · Hand</span>
+      <span class="smallcaps-mono">In the hand of {hand.data.name}</span>
+    </p>
+    <h1 class="entry-title">{hand.data.name}</h1>
+    <div class="hand-header">
+      <OrderSigil order={primary} size={72} />
+      <div>
+        {hand.data.lived && <p class="mono small">{hand.data.lived} &middot; {hand.data.nationality ?? ''}</p>}
+        <div class="hand-orders">
+          {hand.data.primaryOrders.map((o) => <OrderChip order={o} />)}
+        </div>
+      </div>
+    </div>
+
+    <VoiceByline voice={hand.data.voice} />
+
+    <hr class="rule-decorated"><span>✦</span></hr>
+
+    <div class="hand-prose">
+      <Content />
+    </div>
+
+    {dossiers.length > 0 && (
+      <section class="hand-dossiers">
+        <h2>Dossiers in this Hand</h2>
+        <ul class="dossier-list">
+          {dossiers.map((d) => (
+            <li>
+              <a href={`/dossiers/${d.slug}`} class="dossier-link">
+                <span class="dossier-year">{d.data.year ?? '—'}</span>
+                <span class="dossier-title">{d.data.title}</span>
+                <span class="dossier-premise">{d.data.premise}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </article>
+</Base>
+
+<style>
+  .hand-header {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .hand-header p.small {
+    margin: 0 0 0.4rem;
+    font-size: 0.86rem;
+    color: var(--ink-faint);
+  }
+  .hand-orders {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .hand-prose :global(h2) {
+    color: var(--accent);
+  }
+  .hand-dossiers {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+  }
+  .dossier-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+  }
+  .dossier-list li {
+    border-bottom: 1px solid var(--rule);
+  }
+  .dossier-link {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.2rem 1rem;
+    padding: 1rem 0;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .dossier-link:hover { color: var(--rubric); }
+  .dossier-year {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    grid-row: 1 / span 2;
+    align-self: start;
+    padding-top: 0.2rem;
+  }
+  .dossier-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+  .dossier-premise {
+    color: var(--ink-soft);
+    font-size: 0.94rem;
+  }
+</style>

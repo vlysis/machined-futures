@@ -1,0 +1,19 @@
+---
+import type { OrderId } from '~/lib/orders';
+import { ORDERS } from '~/lib/orders';
+
+interface Props {
+  order: OrderId;
+  link?: boolean;
+}
+
+const { order, link = true } = Astro.props;
+const o = ORDERS[order];
+const href = `/orders#${order}`;
+const style = `--accent: ${o.accent};`;
+const Tag = link ? 'a' : 'span';
+---
+
+<Tag class="order-chip" style={style} {...link ? { href } : {}}>
+  {o.name}
+</Tag>

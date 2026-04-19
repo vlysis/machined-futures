@@ -1,0 +1,47 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderChip from '~/components/OrderChip.astro';
+import { getCollection } from 'astro:content';
+import { ORDERS } from '~/lib/orders';
+
+const hands = (await getCollection('hands')).sort((a, b) =>
+  a.data.name.split(' ').slice(-1)[0].localeCompare(b.data.name.split(' ').slice(-1)[0])
+);
+---
+
+<Base title="The Hands" description="Authors held in the archive of Machined Futures.">
+  <article class="prose-wide">
+    <p class="entry-eyebrow"><span class="smallcaps-mono">The Archive · Index</span></p>
+    <h1 class="entry-title">Hands</h1>
+    <p>
+      The writers whose work the archive holds. Each is classified by the
+      Orders their fiction most often occupies.
+    </p>
+    <div class="card-grid">
+      {hands.map((hand) => {
+        const primary = hand.data.primaryOrders[0];
+        const accent = ORDERS[primary].accent;
+        return (
+          <a class="card" href={`/hands/${hand.slug}`} style={`--accent: ${accent};`}>
+            <span class="card-eyebrow">{hand.data.lived ?? ''}</span>
+            <h2 class="card-title">{hand.data.name}</h2>
+            <p class="card-body">{hand.data.summary}</p>
+            <div class="card-orders">
+              {hand.data.primaryOrders.map((o) => <OrderChip order={o} />)}
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </article>
+</Base>
+
+<style>
+  .card-orders {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 0.4rem;
+  }
+</style>

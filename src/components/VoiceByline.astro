@@ -1,0 +1,141 @@
+---
+/**
+ * Renders an entry's voice attribution. Every entry declares its voice.
+ * See /colophon for the editorial principles this component serves.
+ */
+interface Correction {
+  date: Date;
+  note: string;
+}
+interface Voice {
+  name: string;
+  role: 'archivist' | 'interlocutor';
+  date: Date;
+  commissioned?: string;
+  corrections?: Correction[];
+}
+interface Props {
+  voice: Voice;
+  /** Render as a compact single line (for indexes) vs. full block (for entries). */
+  compact?: boolean;
+}
+const { voice, compact = false } = Astro.props;
+
+const roleLabel = voice.role === 'archivist' ? 'Archivist' : 'Interlocutor';
+const dateStr = voice.date.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const isoDate = voice.date.toISOString().slice(0, 10);
+const corrections = voice.corrections ?? [];
+---
+
+{compact ? (
+  <p class={`voice-byline voice-byline-compact smallcaps-mono voice-role-${voice.role}`}>
+    <span class="voice-name">By {voice.name}, {roleLabel}</span>
+    <span class="voice-sep">·</span>
+    <time datetime={isoDate}>{dateStr}</time>
+  </p>
+) : (
+  <aside class={`voice-byline voice-role-${voice.role}`}>
+    <p class="voice-line smallcaps-mono">
+      <span class="voice-name">By {voice.name}, {roleLabel}</span>
+      <span class="voice-sep">·</span>
+      <time datetime={isoDate}>{dateStr}</time>
+      {voice.role === 'interlocutor' && (
+        <>
+          <span class="voice-sep">·</span>
+          <a class="voice-meta" href="/colophon" title="See editorial principles">Preserved as written</a>
+        </>
+      )}
+    </p>
+    {voice.commissioned && (
+      <p class="voice-commission">
+        <span class="smallcaps-mono voice-kicker">Commissioned</span>
+        <span>{voice.commissioned}</span>
+      </p>
+    )}
+    {corrections.length > 0 && (
+      <dl class="voice-corrections">
+        {corrections.map((c) => {
+          const cDateStr = c.date.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          });
+          return (
+            <div class="voice-correction">
+              <dt class="smallcaps-mono">
+                Correction <time datetime={c.date.toISOString().slice(0, 10)}>{cDateStr}</time>
+              </dt>
+              <dd>{c.note}</dd>
+            </div>
+          );
+        })}
+      </dl>
+    )}
+  </aside>
+)}
+
+<style>
+  .voice-byline {
+    margin: 0.4rem 0 1.4rem;
+    padding: 0.7rem 0.9rem 0.7rem 1rem;
+    border-left: 2px solid var(--rule);
+    background: rgba(241, 231, 208, 0.35);
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+  .voice-byline-compact {
+    margin: 0;
+    padding: 0;
+    border-left: 0;
+    background: transparent;
+    color: var(--ink-faint);
+    font-size: 0.82rem;
+  }
+  .voice-role-archivist {
+    border-left-color: var(--rubric);
+  }
+  .voice-role-interlocutor {
+    border-left-color: var(--copper);
+  }
+  .voice-line {
+    margin: 0;
+    display: inline;
+  }
+  .voice-name { color: var(--ink); }
+  .voice-role-interlocutor .voice-name { color: var(--copper); }
+  .voice-role-archivist .voice-name { color: var(--rubric); }
+  .voice-sep {
+    margin: 0 0.55em;
+    color: var(--ink-faint);
+  }
+  .voice-meta {
+    color: var(--ink-faint);
+    text-decoration-color: var(--copper);
+    text-decoration-style: dotted;
+  }
+  .voice-commission {
+    margin: 0.5rem 0 0;
+    font-size: 0.86rem;
+    font-style: italic;
+    color: var(--ink-faint);
+  }
+  .voice-kicker {
+    color: var(--copper);
+    margin-right: 0.6em;
+  }
+  .voice-corrections {
+    margin: 0.7rem 0 0;
+    padding: 0.5rem 0 0;
+    border-top: 1px dashed var(--rule);
+  }
+  .voice-correction { display: grid; grid-template-columns: 10rem 1fr; gap: 0.3rem 1rem; margin: 0.3rem 0; }
+  .voice-correction dt { color: var(--rubric); }
+  .voice-correction dd { margin: 0; color: var(--ink-soft); }
+  @media (max-width: 560px) {
+    .voice-correction { grid-template-columns: 1fr; }
+  }
+</style>

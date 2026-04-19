@@ -1,0 +1,245 @@
+---
+import Base from '~/layouts/Base.astro';
+import { ORDERS } from '~/lib/orders';
+
+/**
+ * Concordance v0 — a static celestial chart of the archive.
+ * Nodes are hand-placed for the opening four Hands; the interactive
+ * force-layout version is a later revision.
+ */
+
+type Node = {
+  id: string;
+  kind: 'hand' | 'dossier' | 'article';
+  label: string;
+  href: string;
+  x: number;
+  y: number;
+  order: keyof typeof ORDERS;
+  r?: number;
+};
+
+type Edge = { from: string; to: string };
+
+const W = 1100;
+const H = 700;
+
+const nodes: Node[] = [
+  // Hands (larger stars)
+  { id: 'h-asimov',  kind: 'hand', label: 'Asimov',  href: '/hands/asimov',  x: 300, y: 200, order: 'constraint', r: 8 },
+  { id: 'h-herbert', kind: 'hand', label: 'Herbert', href: '/hands/herbert', x: 150, y: 440, order: 'prohibition', r: 8 },
+  { id: 'h-chiang',  kind: 'hand', label: 'Chiang',  href: '/hands/chiang',  x: 470, y: 230, order: 'stewardship', r: 8 },
+  { id: 'h-banks',   kind: 'hand', label: 'Banks',   href: '/hands/banks',   x: 640, y: 460, order: 'partnership', r: 8 },
+  { id: 'h-leckie',  kind: 'hand', label: 'Leckie',  href: '/hands/leckie',  x: 790, y: 230, order: 'sovereignty', r: 8 },
+  { id: 'h-watts',   kind: 'hand', label: 'Watts',   href: '/hands/watts',   x: 950, y: 460, order: 'post-governance', r: 8 },
+
+  // Dossiers (small stars)
+  { id: 'd-ancillary-justice',        kind: 'dossier', label: 'Ancillary Justice',              href: '/dossiers/ancillary-justice',        x: 820, y: 340, order: 'sovereignty',    r: 5 },
+  { id: 'd-blindsight',               kind: 'dossier', label: 'Blindsight',                     href: '/dossiers/blindsight',               x: 890, y: 380, order: 'post-governance',r: 5 },
+  { id: 'd-player-of-games',          kind: 'dossier', label: 'The Player of Games',            href: '/dossiers/player-of-games',          x: 600, y: 380, order: 'partnership',    r: 5 },
+  { id: 'd-lifecycle',                kind: 'dossier', label: 'Lifecycle of Software Objects',  href: '/dossiers/lifecycle-of-software-objects', x: 445, y: 340, order: 'stewardship', r: 5 },
+
+  // Articles (waypoints, diamond)
+  { id: 'a-three-laws',      kind: 'article', label: 'Three Laws',      href: '/articles/three-laws',      x: 330, y: 310, order: 'constraint',      r: 5 },
+  { id: 'a-butlerian-jihad', kind: 'article', label: 'Butlerian Jihad', href: '/articles/butlerian-jihad', x: 230, y: 530, order: 'prohibition',     r: 5 },
+  { id: 'a-digient',         kind: 'article', label: 'Digient',         href: '/articles/digient',         x: 410, y: 480, order: 'stewardship',     r: 5 },
+  { id: 'a-culture-mind',    kind: 'article', label: 'Culture Mind',    href: '/articles/culture-mind',    x: 690, y: 540, order: 'partnership',     r: 5 },
+  { id: 'a-ancillary',       kind: 'article', label: 'Ancillary',       href: '/articles/ancillary',       x: 840, y: 260, order: 'sovereignty',     r: 5 },
+  { id: 'a-radchaai',        kind: 'article', label: 'Radchaai',        href: '/articles/radchaai',        x: 740, y: 170, order: 'sovereignty',     r: 5 },
+  { id: 'a-scrambler',       kind: 'article', label: 'Scrambler',       href: '/articles/scrambler',       x: 1000, y: 330, order: 'post-governance',r: 5 },
+  { id: 'a-chinese-room',    kind: 'article', label: 'Chinese Room',    href: '/articles/chinese-room',    x: 920, y: 560, order: 'post-governance',r: 5 },
+];
+
+const edges: Edge[] = [
+  { from: 'h-asimov',  to: 'a-three-laws' },
+  { from: 'h-herbert', to: 'a-butlerian-jihad' },
+  { from: 'h-chiang',  to: 'd-lifecycle' },
+  { from: 'd-lifecycle', to: 'a-digient' },
+  { from: 'h-chiang',  to: 'a-digient' },
+  { from: 'h-banks',   to: 'd-player-of-games' },
+  { from: 'd-player-of-games', to: 'a-culture-mind' },
+  { from: 'h-banks',   to: 'a-culture-mind' },
+  { from: 'h-leckie',  to: 'd-ancillary-justice' },
+  { from: 'd-ancillary-justice', to: 'a-ancillary' },
+  { from: 'd-ancillary-justice', to: 'a-radchaai' },
+  { from: 'h-leckie', to: 'a-ancillary' },
+  { from: 'h-leckie', to: 'a-radchaai' },
+  { from: 'h-watts', to: 'd-blindsight' },
+  { from: 'd-blindsight', to: 'a-scrambler' },
+  { from: 'd-blindsight', to: 'a-chinese-room' },
+  { from: 'a-scrambler', to: 'a-chinese-room' },
+];
+
+const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+
+// Spectrum bands across x-axis (indicative — just a wash of colour)
+const bands = [
+  { x: 80,  w: 160, color: ORDERS['prohibition'].accent },
+  { x: 240, w: 160, color: ORDERS['constraint'].accent },
+  { x: 400, w: 160, color: ORDERS['stewardship'].accent },
+  { x: 560, w: 160, color: ORDERS['partnership'].accent },
+  { x: 720, w: 160, color: ORDERS['sovereignty'].accent },
+  { x: 880, w: 160, color: ORDERS['post-governance'].accent },
+];
+---
+
+<Base
+  title="The Concordance"
+  description="A celestial chart of the archive: Hands, Dossiers, and Articles of Doctrine arranged across the Six Orders."
+>
+  <article class="prose-wide">
+    <p class="entry-eyebrow"><span class="smallcaps-mono">The Archive · The Concordance</span></p>
+    <h1 class="entry-title">The Concordance</h1>
+    <p>
+      The archive's visual index. Hands are named stars; Dossiers are
+      lesser stars clustered around them; Articles of Doctrine are the
+      waypoints where constellations touch. The chart is drawn across
+      the Six Orders from <em>Prohibition</em> at the west to
+      <em>Post-governance</em> at the east.
+    </p>
+    <p class="caption smallcaps-mono">
+      Concordance v0 &middot; a hand-placed reading. The force-laid
+      interactive version is in preparation.
+    </p>
+
+    <figure class="concordance-figure">
+      <svg class="concordance" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="The Concordance of Machined Futures">
+        <defs>
+          <pattern id="paper-weave" width="6" height="6" patternUnits="userSpaceOnUse">
+            <rect width="6" height="6" fill="transparent"/>
+            <path d="M0 3 L6 3" stroke="rgba(107,94,73,0.04)" stroke-width="1"/>
+          </pattern>
+          <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Order bands as faint washes */}
+        {bands.map((b) => (
+          <rect x={b.x} y="0" width={b.w} height={H} fill={b.color} opacity="0.04" />
+        ))}
+        <rect x="0" y="0" width={W} height={H} fill="url(#paper-weave)" />
+
+        {/* Horizontal spine — the spectrum axis */}
+        <line x1="80" y1={H - 60} x2={W - 60} y2={H - 60} stroke="rgba(26,23,18,0.3)" stroke-dasharray="2 4" />
+        {bands.map((b, i) => (
+          <text
+            x={b.x + b.w / 2}
+            y={H - 36}
+            text-anchor="middle"
+            font-family="IBM Plex Mono, monospace"
+            font-size="10"
+            letter-spacing="1.5"
+            fill="rgba(26,23,18,0.55)"
+          >
+            {ORDERS[Object.keys(ORDERS)[i] as keyof typeof ORDERS].name.toUpperCase()}
+          </text>
+        ))}
+
+        {/* Edges — copper traces */}
+        {edges.map((e) => {
+          const a = byId[e.from];
+          const b = byId[e.to];
+          return (
+            <line
+              x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+              stroke="#b87333"
+              stroke-width="0.9"
+              opacity="0.55"
+            />
+          );
+        })}
+
+        {/* Nodes */}
+        {nodes.map((n) => {
+          const accent = ORDERS[n.order].accent;
+          const isHand = n.kind === 'hand';
+          const isArticle = n.kind === 'article';
+          return (
+            <a href={n.href}>
+              <g class="cc-node" data-kind={n.kind}>
+                {isHand && (
+                  <>
+                    <circle cx={n.x} cy={n.y} r={(n.r ?? 6) + 6} fill={accent} opacity="0.12" filter="url(#soft-glow)" />
+                    <circle cx={n.x} cy={n.y} r={n.r ?? 6} fill={accent} stroke="var(--ink)" stroke-width="1" />
+                  </>
+                )}
+                {n.kind === 'dossier' && (
+                  <circle cx={n.x} cy={n.y} r={n.r ?? 5} fill="var(--parchment)" stroke={accent} stroke-width="1.4" />
+                )}
+                {isArticle && (
+                  <rect
+                    x={n.x - (n.r ?? 5)}
+                    y={n.y - (n.r ?? 5)}
+                    width={(n.r ?? 5) * 2}
+                    height={(n.r ?? 5) * 2}
+                    transform={`rotate(45 ${n.x} ${n.y})`}
+                    fill="var(--parchment)"
+                    stroke={accent}
+                    stroke-width="1.4"
+                  />
+                )}
+                <text
+                  x={n.x + (n.r ?? 5) + 8}
+                  y={n.y + 4}
+                  font-family="EB Garamond, serif"
+                  font-size={isHand ? 15 : 12}
+                  fill="var(--ink)"
+                  class={isHand ? 'cc-label cc-label-hand' : 'cc-label'}
+                >
+                  {n.label}
+                </text>
+              </g>
+            </a>
+          );
+        })}
+      </svg>
+      <figcaption class="smallcaps-mono">
+        ● Hand &nbsp; ○ Dossier &nbsp; ◆ Article of Doctrine &nbsp;&middot;&nbsp;
+        copper traces mark belonging
+      </figcaption>
+    </figure>
+
+    <h2>Next shipments to the archive</h2>
+    <p>
+      The six Hands now on file are Asimov, Banks, Chiang, Herbert,
+      Leckie, and Watts &mdash; one for each position on the spectrum.
+      The next shipment brings Lem, expands the Culture sequence
+      (<em>Excession</em>, <em>Look to Windward</em>), and adds the
+      Articles of Doctrine still outstanding (Mentat, Bene Gesserit,
+      Zeroth Law, Special Circumstances, Golem, and the like).
+    </p>
+  </article>
+</Base>
+
+<style>
+  .concordance-figure {
+    margin: 2rem 0;
+    padding: 1.2rem;
+    border: 1px solid var(--rule);
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(241,231,208,0.6), rgba(231,220,194,0.4));
+  }
+  .concordance {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .concordance a { text-decoration: none; }
+  .cc-node { transition: transform 120ms ease; cursor: pointer; }
+  .cc-node:hover { filter: drop-shadow(0 0 4px var(--copper-glow)); }
+  .cc-label { pointer-events: none; }
+  .cc-label-hand { font-weight: 500; font-style: italic; }
+  .caption { color: var(--ink-faint); }
+  figcaption {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    margin-top: 0.8rem;
+    text-align: center;
+  }
+</style>

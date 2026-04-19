@@ -1,0 +1,79 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderChip from '~/components/OrderChip.astro';
+import OrderSigil from '~/components/OrderSigil.astro';
+import VoiceByline from '~/components/VoiceByline.astro';
+import { getCollection, getEntry } from 'astro:content';
+import { ORDERS } from '~/lib/orders';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles');
+  return articles.map((a) => ({ params: { slug: a.slug }, props: { article: a } }));
+}
+
+const { article } = Astro.props;
+const { Content } = await article.render();
+const related = await Promise.all(
+  article.data.relatedDossiers.map((ref) => getEntry(ref))
+);
+const accent = ORDERS[article.data.order].accent;
+---
+
+<Base title={article.data.name} description={article.data.summary}>
+  <article class="prose" style={`--accent: ${accent};`}>
+    <p class="entry-eyebrow">
+      <span class="smallcaps-mono">The Archive · Article of Doctrine</span>
+      {article.data.origin && (
+        <span class="smallcaps-mono">Origin · {article.data.origin}</span>
+      )}
+    </p>
+    <h1 class="entry-title">{article.data.name}</h1>
+
+    {article.data.alsoKnownAs.length > 0 && (
+      <p class="aka">
+        Also: {article.data.alsoKnownAs.map((n, i) => (
+          <>{i > 0 ? ' · ' : ''}<em>{n}</em></>
+        ))}
+      </p>
+    )}
+
+    <div class="article-sigil">
+      <OrderSigil order={article.data.order} size={72} />
+      <OrderChip order={article.data.order} />
+    </div>
+
+    <VoiceByline voice={article.data.voice} />
+
+    <hr class="rule-decorated"><span>✦</span></hr>
+
+    <div class="article-prose">
+      <Content />
+    </div>
+
+    {related.length > 0 && (
+      <section class="related">
+        <h2>Dossiers that invoke this Article</h2>
+        <ul>
+          {related.map((d) => (
+            <li><a href={`/dossiers/${d.slug}`}>{d.data.title}</a> &mdash; <span class="related-premise">{d.data.premise}</span></li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </article>
+</Base>
+
+<style>
+  .aka { color: var(--ink-faint); font-size: 0.94rem; margin-top: -0.5rem; }
+  .article-sigil {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.2rem 0;
+  }
+  .article-prose :global(h2) { color: var(--accent); }
+  .related { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--rule); }
+  .related ul { list-style: none; padding: 0; }
+  .related li { padding: 0.5rem 0; border-bottom: 1px solid var(--rule); }
+  .related-premise { color: var(--ink-soft); }
+</style>

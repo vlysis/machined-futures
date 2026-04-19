@@ -1,0 +1,228 @@
+---
+/**
+ * ForbiddenSeal — a wax seal that conceals text until broken.
+ *
+ * Spoiler reveal, reframed. The reader sees a sealed block with a short
+ * restriction notice; breaking the seal (a click) reveals the text and
+ * stores that choice in localStorage under a per-work key so it persists.
+ *
+ * Nested <ForbiddenSeal> blocks are allowed (e.g. a work-level seal
+ * containing multiple depth-specific seals). They share the same storage
+ * keyspace.
+ */
+
+interface Props {
+  /** Work identifier (e.g. "ancillary-justice"). Groups seals by story. */
+  work: string;
+  /**
+   * Depth label shown in the restriction notice. Conventions:
+   *   minor  — premise-level reveal
+   *   major  — midpoint turn
+   *   ending — the final revelation
+   */
+  depth?: 'minor' | 'major' | 'ending';
+  /** Short line describing *what* is being sealed. Rendered in the notice. */
+  subject?: string;
+}
+
+const { work, depth = 'major', subject } = Astro.props;
+const key = `mf.seal.${work}.${depth}`;
+const depthLabel: Record<string, string> = {
+  minor: 'Minor reveal',
+  major: 'Major reveal',
+  ending: 'Terminal reveal',
+};
+---
+
+<div class="forbidden-seal" data-seal-key={key} data-depth={depth}>
+  <button type="button" class="seal-face" aria-expanded="false">
+    <svg class="seal-wax" viewBox="0 0 120 120" aria-hidden="true">
+      <defs>
+        <radialGradient id={`wax-${key}`} cx="42%" cy="38%" r="70%">
+          <stop offset="0%" stop-color="#c94a4a" />
+          <stop offset="55%" stop-color="#8a1a1a" />
+          <stop offset="100%" stop-color="#3a0808" />
+        </radialGradient>
+      </defs>
+      <circle cx="60" cy="60" r="46" fill={`url(#wax-${key})`} />
+      {/* Drips */}
+      <path d="M 22 70 Q 18 86 24 96 Q 30 100 34 86 Z" fill="#6e1414" opacity="0.85" />
+      <path d="M 96 68 Q 102 82 98 94 Q 90 98 88 84 Z" fill="#6e1414" opacity="0.85" />
+      {/* Pressed sigil: concentric rings + cross — generic Archive mark */}
+      <g stroke="#f1e7d0" stroke-width="1.4" fill="none" opacity="0.85">
+        <circle cx="60" cy="60" r="28" />
+        <circle cx="60" cy="60" r="20" />
+        <circle cx="60" cy="60" r="12" />
+        <line x1="60" y1="32" x2="60" y2="88" />
+        <line x1="32" y1="60" x2="88" y2="60" />
+      </g>
+      {/* Highlight */}
+      <ellipse cx="46" cy="40" rx="14" ry="6" fill="#f1e7d0" opacity="0.12" />
+    </svg>
+    <div class="seal-notice">
+      <p class="smallcaps-mono seal-stamp">⛨ Restricted · {depthLabel[depth]}</p>
+      {subject ? (
+        <p class="seal-subject">{subject}</p>
+      ) : (
+        <p class="seal-subject">The passage beneath this seal pertains to matters not yet disclosed to the uninitiated.</p>
+      )}
+      <p class="seal-cta smallcaps">Break the seal</p>
+    </div>
+  </button>
+  <div class="seal-body" hidden>
+    <p class="smallcaps-mono seal-unsealed-mark">⛧ Unsealed · {depthLabel[depth]}</p>
+    <slot />
+  </div>
+</div>
+
+<style>
+  .forbidden-seal {
+    margin: 2rem 0;
+    border: 1px solid var(--rule);
+    background: rgba(241, 231, 208, 0.55);
+  }
+
+  .seal-face {
+    all: unset;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.2rem;
+    align-items: center;
+    padding: 1.2rem 1.3rem;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    transition: background 160ms ease;
+  }
+
+  .seal-face:hover,
+  .seal-face:focus-visible {
+    background: rgba(138, 26, 26, 0.06);
+    outline: none;
+  }
+
+  .seal-face:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--copper);
+  }
+
+  .seal-wax {
+    width: 68px;
+    height: 68px;
+    filter: drop-shadow(0 1px 0 rgba(58, 8, 8, 0.6)) drop-shadow(0 0 10px rgba(200, 74, 74, 0.25));
+    transition: filter 200ms ease, transform 200ms ease;
+  }
+
+  .seal-face:hover .seal-wax,
+  .seal-face:focus-visible .seal-wax {
+    filter: drop-shadow(0 1px 0 rgba(58, 8, 8, 0.6)) drop-shadow(0 0 14px rgba(224, 138, 58, 0.5));
+    transform: rotate(-2deg);
+  }
+
+  .seal-notice {
+    color: var(--ink-soft);
+  }
+
+  .seal-stamp {
+    margin: 0 0 0.25rem;
+    color: var(--rubric);
+  }
+
+  .seal-subject {
+    margin: 0 0 0.5rem;
+    font-style: italic;
+    max-width: 42rem;
+  }
+
+  .seal-cta {
+    margin: 0;
+    color: var(--rubric);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+  }
+
+  .seal-body {
+    padding: 1.4rem 1.4rem 0.5rem;
+    border-top: 1px solid var(--rule);
+    background: rgba(241, 231, 208, 0.35);
+    animation: seal-reveal 360ms ease-out;
+  }
+
+  .seal-unsealed-mark {
+    margin: 0 0 0.9rem;
+    color: var(--rubric);
+  }
+
+  .forbidden-seal[data-unsealed] .seal-face { display: none; }
+  .forbidden-seal[data-unsealed] .seal-body { display: block !important; }
+
+  @keyframes seal-reveal {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .seal-body { animation: none; }
+    .seal-face:hover .seal-wax { transform: none; }
+  }
+</style>
+
+<script>
+  // Persist unseals in localStorage so reader's initiations hold between visits.
+  const STORAGE_PREFIX = 'mf.seal.';
+
+  function isUnsealed(key: string): boolean {
+    try {
+      return localStorage.getItem(key) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  function markUnsealed(key: string): void {
+    try {
+      localStorage.setItem(key, '1');
+    } catch {
+      /* private mode / disabled storage — fail quietly */
+    }
+  }
+
+  function initSeal(el: HTMLElement): void {
+    const key = el.dataset.sealKey;
+    if (!key) return;
+    if (isUnsealed(key)) {
+      el.setAttribute('data-unsealed', '');
+      const body = el.querySelector<HTMLElement>('.seal-body');
+      if (body) body.hidden = false;
+      const face = el.querySelector<HTMLButtonElement>('.seal-face');
+      if (face) face.setAttribute('aria-expanded', 'true');
+      return;
+    }
+    const face = el.querySelector<HTMLButtonElement>('.seal-face');
+    const body = el.querySelector<HTMLElement>('.seal-body');
+    if (!face || !body) return;
+    face.addEventListener('click', () => {
+      body.hidden = false;
+      face.setAttribute('aria-expanded', 'true');
+      el.setAttribute('data-unsealed', '');
+      markUnsealed(key);
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('.forbidden-seal').forEach(initSeal);
+
+  // Expose a global reset for "re-seal everything" controls.
+  (window as unknown as { machinedFuturesResealAll?: () => void }).machinedFuturesResealAll = () => {
+    try {
+      const toRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(STORAGE_PREFIX)) toRemove.push(k);
+      }
+      toRemove.forEach((k) => localStorage.removeItem(k));
+      location.reload();
+    } catch {
+      /* noop */
+    }
+  };
+</script>

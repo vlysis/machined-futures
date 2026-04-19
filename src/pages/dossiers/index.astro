@@ -1,0 +1,48 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderChip from '~/components/OrderChip.astro';
+import { getCollection, getEntry } from 'astro:content';
+import { ORDERS } from '~/lib/orders';
+
+const dossiers = (await getCollection('dossiers')).sort((a, b) =>
+  (a.data.year ?? 0) - (b.data.year ?? 0)
+);
+
+const withHand = await Promise.all(
+  dossiers.map(async (d) => {
+    const hand = await getEntry(d.data.hand);
+    return { dossier: d, hand };
+  })
+);
+---
+
+<Base title="Dossiers" description="Works held in the archive of Machined Futures.">
+  <article class="prose-wide">
+    <p class="entry-eyebrow"><span class="smallcaps-mono">The Archive · Index</span></p>
+    <h1 class="entry-title">Dossiers</h1>
+    <p>
+      The archive's file on each work. Dossiers are organised first by
+      Hand, then by year. Reveal-sensitive passages are held under seal.
+    </p>
+    <div class="card-grid">
+      {withHand.map(({ dossier, hand }) => {
+        const accent = ORDERS[dossier.data.primaryOrder].accent;
+        return (
+          <a class="card" href={`/dossiers/${dossier.slug}`} style={`--accent: ${accent};`}>
+            <span class="card-eyebrow">{hand.data.name} &middot; {dossier.data.year ?? ''}</span>
+            <h2 class="card-title">{dossier.data.title}</h2>
+            <p class="card-body">{dossier.data.premise}</p>
+            <div class="card-orders">
+              <OrderChip order={dossier.data.primaryOrder} />
+              {dossier.data.secondaryOrders.map((o) => <OrderChip order={o} />)}
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </article>
+</Base>
+
+<style>
+  .card-orders { display: flex; gap: 0.4rem; flex-wrap: wrap; padding-top: 0.4rem; }
+</style>

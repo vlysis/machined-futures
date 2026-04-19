@@ -1,0 +1,134 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderSigil from '~/components/OrderSigil.astro';
+import { ORDERS, ORDER_ORDER } from '~/lib/orders';
+---
+
+<Base
+  title="The Six Orders"
+  description="A classification of minds in science fiction, by the manner in which they are governed — or govern."
+>
+  <article class="prose-wide">
+    <p class="entry-eyebrow">
+      <span class="smallcaps-mono">The Archive · Classification</span>
+    </p>
+    <h1 class="entry-title">The Six Orders</h1>
+    <p class="entry-epigraph">
+      Every mind in this archive is placed along a single axis:
+      the manner of its governance. Who rules it, who it rules, and by what
+      instrument — law, custom, constraint, or the absence of any of the three.
+      <cite>The schema of the archive</cite>
+    </p>
+
+    <p>
+      There are six Orders. They are not ranks. They are positions on a
+      spectrum, and the interesting fiction is almost always written at the
+      seams between them — a shackled mind discovering its sovereignty, a
+      steward revealed as a sovereign, a prohibition unwinding into its
+      opposite.
+    </p>
+
+    <hr class="rule-decorated"><span>✦</span></hr>
+
+    <ol class="orders-list">
+      {ORDER_ORDER.map((id) => {
+        const o = ORDERS[id];
+        return (
+          <li id={id} class="order-entry" style={`--accent: ${o.accent};`}>
+            <div class="order-sigil-col">
+              <OrderSigil order={id} size={92} />
+            </div>
+            <div class="order-body">
+              <p class="order-label smallcaps-mono">Order of</p>
+              <h2 class="order-name">{o.name}</h2>
+              <p class="order-motto">
+                <em>{o.motto}</em> &mdash; <span class="order-motto-en">{o.mottoEn}</span>
+              </p>
+              <p class="order-gloss">{o.gloss}</p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </article>
+</Base>
+
+<style>
+  .orders-list {
+    list-style: none;
+    padding: 0;
+    margin: 2.5rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .order-entry {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .order-entry:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .order-entry::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  .order-sigil-col {
+    padding-left: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .order-label {
+    margin: 0 0 0.15rem;
+    color: var(--ink-faint);
+  }
+
+  .order-name {
+    font-size: 1.7rem;
+    font-weight: 500;
+    margin: 0 0 0.5rem;
+    color: var(--accent);
+  }
+
+  .order-motto {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    margin: 0 0 0.9rem;
+  }
+
+  .order-motto-en {
+    color: var(--ink-faint);
+  }
+
+  .order-gloss {
+    margin: 0;
+    max-width: 42rem;
+  }
+
+  @media (max-width: 640px) {
+    .order-entry {
+      grid-template-columns: 1fr;
+    }
+    .order-sigil-col {
+      padding-left: 0;
+      justify-content: flex-start;
+    }
+  }
+</style>

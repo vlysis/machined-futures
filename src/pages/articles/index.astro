@@ -1,0 +1,83 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderChip from '~/components/OrderChip.astro';
+import { getCollection } from 'astro:content';
+import { ORDERS, ORDER_ORDER } from '~/lib/orders';
+
+const articles = await getCollection('articles');
+
+// Group by Order, preserving Order sequence.
+const groups = ORDER_ORDER.map((id) => ({
+  order: id,
+  articles: articles
+    .filter((a) => a.data.order === id)
+    .sort((a, b) => a.data.name.localeCompare(b.data.name)),
+})).filter((g) => g.articles.length > 0);
+---
+
+<Base
+  title="Articles of Doctrine"
+  description="Named concepts in the archive — Three Laws, Butlerian Jihad, Ancillary, and others."
+>
+  <article class="prose-wide">
+    <p class="entry-eyebrow"><span class="smallcaps-mono">The Archive · Index</span></p>
+    <h1 class="entry-title">Articles of Doctrine</h1>
+    <p>
+      Each Article names an idea — a law, an institution, a category of
+      mind — that shows up across multiple Hands. Articles are arranged
+      by their primary Order.
+    </p>
+
+    {groups.map(({ order, articles }) => (
+      <section class="article-group" style={`--accent: ${ORDERS[order].accent};`}>
+        <h2 class="group-heading">Of the Order of {ORDERS[order].name}</h2>
+        <ul class="article-list">
+          {articles.map((a) => (
+            <li>
+              <a href={`/articles/${a.slug}`}>
+                <span class="a-name">{a.data.name}</span>
+                <span class="a-summary">{a.data.summary}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </article>
+</Base>
+
+<style>
+  .article-group {
+    margin-top: 2.5rem;
+    padding-top: 1.2rem;
+    border-top: 2px solid var(--accent);
+  }
+  .group-heading {
+    color: var(--accent);
+    margin-top: 0;
+  }
+  .article-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .article-list li { border-bottom: 1px solid var(--rule); }
+  .article-list a {
+    display: grid;
+    grid-template-columns: 14rem 1fr;
+    gap: 1rem;
+    padding: 0.9rem 0;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .article-list a:hover { color: var(--rubric); }
+  .a-name {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.08rem;
+  }
+  .a-summary { color: var(--ink-soft); font-size: 0.94rem; }
+  @media (max-width: 640px) {
+    .article-list a { grid-template-columns: 1fr; }
+  }
+</style>

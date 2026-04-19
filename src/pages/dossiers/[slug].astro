@@ -1,0 +1,117 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderChip from '~/components/OrderChip.astro';
+import OrderSigil from '~/components/OrderSigil.astro';
+import VoiceByline from '~/components/VoiceByline.astro';
+import { getCollection, getEntry } from 'astro:content';
+import { ORDERS } from '~/lib/orders';
+
+export async function getStaticPaths() {
+  const dossiers = await getCollection('dossiers');
+  return dossiers.map((d) => ({ params: { slug: d.slug }, props: { dossier: d } }));
+}
+
+const { dossier } = Astro.props;
+const hand = await getEntry(dossier.data.hand);
+const articles = await Promise.all(
+  dossier.data.articles.map((ref) => getEntry(ref))
+);
+const { Content } = await dossier.render();
+const accent = ORDERS[dossier.data.primaryOrder].accent;
+---
+
+<Base title={dossier.data.title} description={dossier.data.premise}>
+  <article class="prose" style={`--accent: ${accent};`}>
+    <p class="entry-eyebrow">
+      <span class="smallcaps-mono">The Archive · Dossier</span>
+      <span class="smallcaps-mono">In the hand of <a href={`/hands/${hand.slug}`}>{hand.data.name}</a></span>
+    </p>
+    <h1 class="entry-title">{dossier.data.title}</h1>
+
+    {dossier.data.epigraph && (
+      <blockquote class="entry-epigraph">
+        {dossier.data.epigraph.text}
+        {dossier.data.epigraph.attribution && (
+          <cite>— {dossier.data.epigraph.attribution}</cite>
+        )}
+      </blockquote>
+    )}
+
+    <dl class="entry-meta">
+      <dt>Hand</dt>
+      <dd><a href={`/hands/${hand.slug}`}>{hand.data.name}</a></dd>
+      {dossier.data.year && (<><dt>Year</dt><dd>{dossier.data.year}</dd></>)}
+      {dossier.data.series && (
+        <><dt>Series</dt><dd>{dossier.data.series}{dossier.data.seriesPosition ? ` · №${dossier.data.seriesPosition}` : ''}</dd></>
+      )}
+      <dt>Order</dt>
+      <dd class="meta-orders">
+        <OrderChip order={dossier.data.primaryOrder} />
+        {dossier.data.secondaryOrders.map((o) => <OrderChip order={o} />)}
+      </dd>
+      <dt>Throughline</dt>
+      <dd>{dossier.data.governanceNote}</dd>
+    </dl>
+
+    <div class="dossier-sigil">
+      <OrderSigil order={dossier.data.primaryOrder} size={72} />
+    </div>
+
+    <VoiceByline voice={dossier.data.voice} />
+
+    <div class="dossier-prose">
+      <Content />
+    </div>
+
+    {articles.length > 0 && (
+      <section class="related-articles">
+        <h2>Related Articles of Doctrine</h2>
+        <ul class="related-list">
+          {articles.map((a) => (
+            <li>
+              <a href={`/articles/${a.slug}`}>
+                <span class="related-title">{a.data.name}</span>
+                <span class="related-summary">{a.data.summary}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </article>
+</Base>
+
+<style>
+  .meta-orders { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .dossier-sigil { margin: 1.2rem 0 2rem; }
+  .dossier-prose :global(h2) { color: var(--accent); }
+  .related-articles {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+  }
+  .related-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+  }
+  .related-list li { border-bottom: 1px solid var(--rule); }
+  .related-list a {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    gap: 1rem;
+    padding: 1rem 0;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .related-list a:hover { color: var(--rubric); }
+  .related-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.08rem;
+  }
+  .related-summary { color: var(--ink-soft); font-size: 0.94rem; }
+  @media (max-width: 640px) {
+    .related-list a { grid-template-columns: 1fr; }
+  }
+</style>

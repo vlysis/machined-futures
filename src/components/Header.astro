@@ -1,0 +1,22 @@
+---
+const { pathname } = Astro.url;
+const isActive = (href: string) =>
+  pathname === href || (href !== '/' && pathname.startsWith(href));
+---
+
+<header class="site-header">
+  <a href="/" class="wordmark">
+    <span class="wordmark-dot" aria-hidden="true"></span>
+    Machined Futures
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="/hands" aria-current={isActive('/hands') ? 'page' : undefined}>Hands</a>
+    <a href="/dossiers" aria-current={isActive('/dossiers') ? 'page' : undefined}>Dossiers</a>
+    <a href="/articles" aria-current={isActive('/articles') ? 'page' : undefined}>Articles</a>
+    <a href="/commentaries" aria-current={isActive('/commentaries') ? 'page' : undefined}>Commentaries</a>
+    <a href="/marginalia" aria-current={isActive('/marginalia') ? 'page' : undefined}>Marginalia</a>
+    <a href="/orders" aria-current={isActive('/orders') ? 'page' : undefined}>Orders</a>
+    <a href="/concordance" aria-current={isActive('/concordance') ? 'page' : undefined}>Concordance</a>
+    <a href="/colophon" aria-current={isActive('/colophon') ? 'page' : undefined}>Colophon</a>
+  </nav>
+</header>

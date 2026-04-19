@@ -1,0 +1,93 @@
+---
+import type { OrderId } from '~/lib/orders';
+import { ORDERS } from '~/lib/orders';
+
+interface Props {
+  order: OrderId;
+  size?: number;
+  title?: boolean;
+}
+
+const { order, size = 44, title = true } = Astro.props;
+const o = ORDERS[order];
+const s = size;
+const half = s / 2;
+---
+
+<svg
+  viewBox={`0 0 ${s} ${s}`}
+  width={s}
+  height={s}
+  role="img"
+  aria-label={`Sigil of the Order of ${o.name}`}
+  class="order-sigil"
+  data-order={order}
+>
+  {title && <title>{`Order of ${o.name}`}</title>}
+  <defs>
+    <radialGradient id={`sigil-core-${order}`} cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color={o.accent} stop-opacity="0.9" />
+      <stop offset="70%" stop-color={o.accent} stop-opacity="0.35" />
+      <stop offset="100%" stop-color={o.accent} stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  {/* Outer iron-gall ring */}
+  <circle cx={half} cy={half} r={half - 2} fill="none" stroke="var(--ink)" stroke-width="1.1" opacity="0.85" />
+  {/* Inner rubrication ring */}
+  <circle cx={half} cy={half} r={half - 6} fill="none" stroke={o.accent} stroke-width="0.6" opacity="0.7" />
+
+  {/* Per-Order glyph inside the ring */}
+  {order === 'prohibition' && (
+    <g stroke="var(--ink)" stroke-width="1.4" fill="none" stroke-linecap="round">
+      <circle cx={half} cy={half} r={half - 11} stroke-dasharray="2 3" opacity="0.7" />
+      <line x1={half - (half - 8)} y1={half - (half - 8)} x2={half + (half - 8)} y2={half + (half - 8)} stroke={o.accent} stroke-width="2" />
+    </g>
+  )}
+
+  {order === 'constraint' && (
+    <g stroke={o.accent} fill="none" stroke-width="1.1" opacity="0.9">
+      <circle cx={half} cy={half} r={half - 9} />
+      <circle cx={half} cy={half} r={half - 13} />
+      <circle cx={half} cy={half} r={half - 17} />
+    </g>
+  )}
+
+  {order === 'stewardship' && (
+    <g fill="none" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round">
+      <path d={`M ${half - 8} ${half + 6} Q ${half} ${half - 10} ${half + 8} ${half + 6}`} />
+      <circle cx={half} cy={half - 4} r="2.2" fill={o.accent} stroke="none" />
+      <circle cx={half} cy={half - 4} r="4.5" fill={`url(#sigil-core-${order})`} stroke="none" />
+    </g>
+  )}
+
+  {order === 'partnership' && (
+    <g fill="none" stroke-width="1.2" stroke-linecap="round">
+      <path d={`M ${half - 9} ${half - 7} C ${half - 2} ${half - 2}, ${half + 2} ${half + 2}, ${half + 9} ${half + 7}`} stroke="var(--ink)" />
+      <path d={`M ${half - 9} ${half + 7} C ${half - 2} ${half + 2}, ${half + 2} ${half - 2}, ${half + 9} ${half - 7}`} stroke={o.accent} />
+      <circle cx={half} cy={half} r="1.6" fill={o.accent} />
+    </g>
+  )}
+
+  {order === 'sovereignty' && (
+    <g stroke={o.accent} stroke-width="1.2" fill="none" stroke-linecap="round">
+      <path d={`M ${half - 9} ${half + 4} L ${half - 6} ${half - 7} L ${half} ${half - 2} L ${half + 6} ${half - 7} L ${half + 9} ${half + 4} Z`} />
+      <circle cx={half} cy={half + 4} r="1.4" fill={o.accent} />
+    </g>
+  )}
+
+  {order === 'post-governance' && (
+    <g stroke="var(--ink)" stroke-width="1.2" fill="none">
+      <ellipse cx={half} cy={half} rx={half - 9} ry={(half - 9) * 0.55} />
+      <circle cx={half} cy={half} r="2.6" fill="var(--ink)" stroke="none" />
+      <circle cx={half} cy={half} r="6" fill={`url(#sigil-core-${order})`} stroke="none" opacity="0.4" />
+    </g>
+  )}
+</svg>
+
+<style>
+  .order-sigil {
+    display: inline-block;
+    vertical-align: middle;
+  }
+</style>

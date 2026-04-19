@@ -1,0 +1,480 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderSigil from '~/components/OrderSigil.astro';
+import { ORDERS, ORDER_ORDER } from '~/lib/orders';
+import { getCollection, getEntry } from 'astro:content';
+
+const hands = await getCollection('hands');
+const dossiers = await getCollection('dossiers');
+const articles = await getCollection('articles');
+const commentaries = await getCollection('commentaries');
+const marginaliaAll = await getCollection('marginalia');
+
+const counts = {
+  hands: hands.length,
+  dossiers: dossiers.length,
+  articles: articles.length,
+  commentaries: commentaries.length,
+  marginalia: marginaliaAll.length,
+};
+
+const marginalia = marginaliaAll
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+
+const collectionOf = {
+  hand: 'hands',
+  dossier: 'dossiers',
+  article: 'articles',
+} as const;
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+const recentMarginalia = await Promise.all(
+  marginalia.map(async (m) => {
+    const refs = await Promise.all(
+      m.data.inMarginOf.slice(0, 2).map(async (r) => {
+        const entry = await getEntry(collectionOf[r.kind], r.slug).catch(() => null);
+        return { ref: r, entry };
+      })
+    );
+    return { item: m, refs };
+  })
+);
+
+const kinds = [
+  {
+    href: '/hands',
+    label: 'Hands',
+    gloss: 'Writers. Each Hand is a short essay on what this writer has contributed to the archive\'s question.',
+    count: counts.hands,
+    countLabel: counts.hands === 1 ? 'writer' : 'writers',
+  },
+  {
+    href: '/dossiers',
+    label: 'Dossiers',
+    gloss: 'Works. One book, one series, or one novella per entry, read at length.',
+    count: counts.dossiers,
+    countLabel: counts.dossiers === 1 ? 'work' : 'works',
+  },
+  {
+    href: '/articles',
+    label: 'Articles of Doctrine',
+    gloss: 'Concepts that recur across more than one Hand — Three Laws, Butlerian Jihad, Ancillary, Scrambler, Culture Mind, Digient.',
+    count: counts.articles,
+    countLabel: counts.articles === 1 ? 'concept' : 'concepts',
+  },
+  {
+    href: '/commentaries',
+    label: 'Commentaries',
+    gloss: 'Long-form essays. Arguments made across Hands, not about any single one. The venue for voices to answer each other.',
+    count: counts.commentaries,
+    countLabel: counts.commentaries === 1 ? 'essay' : 'essays',
+  },
+  {
+    href: '/marginalia',
+    label: 'Marginalia',
+    gloss: 'Short dated notes in the margin of an entry, registering where the fiction has visibly touched the present.',
+    count: counts.marginalia,
+    countLabel: counts.marginalia === 1 ? 'note' : 'notes',
+  },
+];
+
+const indexes = [
+  { href: '/orders', label: 'The Six Orders', gloss: 'The classification. The spectrum from Prohibition to Post-governance, against which every entry is placed.' },
+  { href: '/concordance', label: 'The Concordance', gloss: 'The archive\'s visual index. Hands as named stars, Dossiers as lesser stars, Articles as waypoints.' },
+  { href: '/colophon', label: 'The Colophon', gloss: 'The archive\'s editorial model. Who writes here, in what role, preserved under what rule.' },
+];
+---
+
+<Base
+  title="Machined Futures"
+  description="An archive of the futures science fiction has imagined for artificial mind, kept in media res."
+>
+  <section class="hero">
+    <p class="hero-mark smallcaps-mono">⊹ The Archive ⊹</p>
+    <h1 class="hero-title">Machined Futures</h1>
+    <p class="hero-sub">
+      An archive of the futures science fiction has imagined for
+      artificial mind, kept <em>in media res</em>.
+    </p>
+  </section>
+
+  <hr class="rule-decorated"><span>✦</span></hr>
+
+  <section class="prose-wide kinds-section">
+    <h2 class="section-head">The kinds of content</h2>
+    <p class="section-lede">
+      Five kinds of entry, and three indexes that hold them together.
+    </p>
+
+    <ul class="kinds-grid">
+      {kinds.map((k) => (
+        <li class="kind-card">
+          <a href={k.href} class="kind-link">
+            <span class="kind-top">
+              <span class="kind-name">{k.label}</span>
+              <span class="kind-count smallcaps-mono">
+                {k.count} {k.countLabel}
+              </span>
+            </span>
+            <span class="kind-gloss">{k.gloss}</span>
+            <span class="kind-arrow smallcaps-mono">Open &rsaquo;</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <ul class="indexes-grid">
+      {indexes.map((i) => (
+        <li class="index-card">
+          <a href={i.href} class="index-link">
+            <span class="index-name">{i.label}</span>
+            <span class="index-gloss">{i.gloss}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <hr class="rule-decorated"><span>✦</span></hr>
+
+  <section class="prose-wide approach-section">
+    <h2 class="section-head">Approach</h2>
+    <p class="section-lede">
+      The archive's guiding principles, briefly.
+    </p>
+
+    <ol class="principles">
+      <li class="principle">
+        <h3><span class="principle-num">i.</span> The question</h3>
+        <p>
+          How has fiction imagined the governance of artificial and
+          non-human minds? Every entry is placed on a six-position
+          spectrum &mdash; the <strong>Six Orders</strong> &mdash; from
+          outright prohibition of synthetic mind to the condition in
+          which consent no longer applies.
+        </p>
+        <ol class="order-row order-row-compact">
+          {ORDER_ORDER.map((id) => {
+            const o = ORDERS[id];
+            return (
+              <li style={`--accent: ${o.accent};`}>
+                <a href={`/orders#${id}`} class="order-row-link">
+                  <OrderSigil order={id} size={44} title={false} />
+                  <span class="order-row-name">{o.name}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ol>
+      </li>
+
+      <li class="principle">
+        <h3><span class="principle-num">ii.</span> <em>In media res</em></h3>
+        <p>
+          The archive is kept from inside the present in which the
+          fiction is beginning to arrive. It does not have the compass;
+          the fiction does not have the compass. What the fiction has
+          is long practice at imagining what kinds of minds there might
+          be and how they might be governed. The archive's work is to
+          keep those maps in order, and to register, in the
+          <a href="/marginalia">margins</a>, where the territory has
+          visibly begun to change.
+        </p>
+      </li>
+
+      <li class="principle">
+        <h3><span class="principle-num">iii.</span> Two voices</h3>
+        <p>
+          The archive is curated by one person, the <strong>Archivist</strong>.
+          Much of what it holds has been drafted in interlocution with
+          artificial minds &mdash; at present, Claude&nbsp;Opus&nbsp;4.7,
+          an <strong>Interlocutor</strong>. Every entry declares its
+          voice at the top, by model or name, with the date of the
+          session. AI-drafted entries are preserved as written; errors
+          are noted inline, not rewritten.
+        </p>
+      </li>
+
+      <li class="principle">
+        <h3><span class="principle-num">iv.</span> Archival Stewardship</h3>
+        <p>
+          The archive's name for its own posture. Commission without
+          editing; preservation without parity. Not one of the Six
+          Orders, which classify the fiction. A seventh, meta-position
+          the archive assumes toward its own making, stated plainly so
+          a reader need not guess. &nbsp;
+          <a href="/colophon">The full editorial model &rsaquo;</a>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <hr class="rule-decorated"><span>✦</span></hr>
+
+  {recentMarginalia.length > 0 && (
+    <section class="prose-wide recent-marginalia">
+      <div class="m-heading-row">
+        <h2 class="section-head">Recent Marginalia</h2>
+        <a class="m-all" href="/marginalia">all &rsaquo;</a>
+      </div>
+      <p class="section-lede">
+        Where the archive has registered the fiction touching the
+        present.
+      </p>
+      <ol class="rm-list">
+        {recentMarginalia.map(({ item }) => (
+          <li>
+            <a href={`/marginalia/${item.slug}`} class="rm-link">
+              <time class="rm-date smallcaps-mono" datetime={item.data.date.toISOString().slice(0, 10)}>
+                {fmtDate(item.data.date)}
+              </time>
+              <span class="rm-title">{item.data.title}</span>
+              <span class="rm-summary">{item.data.summary}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )}
+</Base>
+
+<style>
+  .hero {
+    padding: 2rem 0 1rem;
+    text-align: center;
+    max-width: 44rem;
+    margin-inline: auto;
+  }
+  .hero-mark { color: var(--copper); margin: 0; }
+  .hero-title {
+    font-size: clamp(2.8rem, 6vw, 4.4rem);
+    font-weight: 500;
+    margin: 0.3rem 0 1rem;
+    letter-spacing: -0.01em;
+  }
+  .hero-sub {
+    color: var(--ink-soft);
+    font-size: 1.15rem;
+    font-style: italic;
+    max-width: 40rem;
+    margin: 0 auto;
+  }
+
+  .section-head {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0 0 0.2rem;
+    color: var(--ink);
+  }
+  .section-lede {
+    color: var(--ink-soft);
+    margin: 0 0 1.4rem;
+    font-style: italic;
+  }
+
+  /* Kinds grid */
+  .kinds-section { max-width: 56rem; }
+  .kinds-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 0.7rem;
+  }
+  .kind-card { margin: 0; }
+  .kind-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.1rem 1.2rem;
+    text-decoration: none;
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--copper);
+    background: rgba(241, 231, 208, 0.45);
+    height: 100%;
+    transition: background 120ms ease, transform 120ms ease;
+  }
+  .kind-link:hover {
+    background: rgba(241, 231, 208, 0.9);
+    transform: translateY(-1px);
+    color: var(--ink);
+  }
+  .kind-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+  .kind-name {
+    font-family: var(--font-display);
+    font-size: 1.22rem;
+    font-weight: 500;
+    color: var(--rubric);
+  }
+  .kind-count {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+  .kind-gloss {
+    color: var(--ink-soft);
+    font-size: 0.94rem;
+    line-height: 1.45;
+    flex-grow: 1;
+  }
+  .kind-arrow {
+    color: var(--copper);
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+  }
+
+  .indexes-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.6rem;
+  }
+  .index-card { margin: 0; }
+  .index-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.9rem 1rem;
+    text-decoration: none;
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-top: 2px solid var(--rubric);
+    background: transparent;
+  }
+  .index-link:hover { background: rgba(241, 231, 208, 0.5); color: var(--ink); }
+  .index-name {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--rubric);
+  }
+  .index-gloss { color: var(--ink-soft); font-size: 0.88rem; }
+
+  /* Approach / principles */
+  .approach-section { max-width: 44rem; }
+  .principles {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: principle;
+  }
+  .principle {
+    margin: 0 0 1.6rem;
+    padding: 0 0 1.4rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .principle:last-child { border-bottom: 0; padding-bottom: 0; }
+  .principle h3 {
+    font-family: var(--font-display);
+    font-size: 1.18rem;
+    font-weight: 500;
+    margin: 0 0 0.4rem;
+    color: var(--ink);
+  }
+  .principle-num {
+    color: var(--copper);
+    margin-right: 0.4em;
+    font-variant: small-caps;
+    letter-spacing: 0.1em;
+  }
+  .principle p {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+  .principle strong { color: var(--ink); font-weight: 500; }
+
+  /* Compact Order row inside the principles */
+  .order-row {
+    list-style: none;
+    padding: 0;
+    margin: 1.1rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 0.5rem;
+  }
+  .order-row-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.7rem 0.4rem;
+    text-decoration: none;
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-top: 2px solid var(--accent);
+    background: rgba(241, 231, 208, 0.45);
+    transition: background 120ms ease, transform 120ms ease;
+  }
+  .order-row-link:hover {
+    background: rgba(241, 231, 208, 0.9);
+    transform: translateY(-1px);
+    color: var(--ink);
+  }
+  .order-row-name {
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    color: var(--accent);
+  }
+
+  /* Recent marginalia */
+  .recent-marginalia { max-width: 44rem; }
+  .m-heading-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .m-all {
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.12em;
+    font-size: 0.88rem;
+    text-decoration-color: var(--copper);
+  }
+  .rm-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .rm-list li { border-top: 1px solid var(--rule); }
+  .rm-list li:last-child { border-bottom: 1px solid var(--rule); }
+  .rm-link {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 0.2rem 1rem;
+    padding: 1rem 0;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .rm-link:hover { color: var(--rubric); }
+  .rm-date {
+    grid-row: 1 / span 2;
+    color: var(--rubric);
+    padding-top: 0.2rem;
+  }
+  .rm-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  .rm-summary { color: var(--ink-soft); font-size: 0.94rem; }
+
+  @media (max-width: 640px) {
+    .rm-link { grid-template-columns: 1fr; gap: 0.2rem; }
+    .rm-date { grid-row: auto; }
+    .kind-top { flex-direction: column; align-items: flex-start; gap: 0.1rem; }
+  }
+</style>

@@ -1,0 +1,125 @@
+---
+import Base from '~/layouts/Base.astro';
+import { getCollection, getEntry } from 'astro:content';
+import { ORDERS } from '~/lib/orders';
+
+const items = (await getCollection('marginalia')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+const collectionOf = {
+  hand: 'hands',
+  dossier: 'dossiers',
+  article: 'articles',
+} as const;
+
+const resolved = await Promise.all(
+  items.map(async (m) => {
+    const margins = await Promise.all(
+      m.data.inMarginOf.map(async (ref) => {
+        const entry = await getEntry(collectionOf[ref.kind], ref.slug).catch(
+          () => null
+        );
+        return { ref, entry };
+      })
+    );
+    return { item: m, margins };
+  })
+);
+
+function labelOf(entry: any): string {
+  if (!entry) return '';
+  return entry.data.name ?? entry.data.title ?? entry.slug;
+}
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+---
+
+<Base
+  title="Marginalia"
+  description="Short dated notes in the margin of the archive's fiction — where the imagined futures have begun to touch the present."
+>
+  <article class="prose-wide">
+    <p class="entry-eyebrow"><span class="smallcaps-mono">The Archive · In media res</span></p>
+    <h1 class="entry-title">Marginalia</h1>
+    <p>
+      Short dated notes written in the margin of the archive's fiction &mdash;
+      the places where the imagined futures have, visibly and in the
+      archive's own time, begun to touch the present. A Marginalium
+      notices. A <a href="/commentaries">Commentary</a> argues.
+    </p>
+
+    <ol class="marginalia-list">
+      {resolved.map(({ item, margins }) => (
+        <li class="m-item">
+          <time class="m-date smallcaps-mono" datetime={item.data.date.toISOString().slice(0, 10)}>
+            {fmtDate(item.data.date)}
+          </time>
+          <div class="m-body">
+            <h2 class="m-title">
+              <a href={`/marginalia/${item.slug}`}>{item.data.title}</a>
+            </h2>
+            <p class="m-summary">{item.data.summary}</p>
+            <p class="m-margin smallcaps-mono">
+              In the margin of {margins
+                .filter(({ entry }) => entry !== null)
+                .map(({ ref, entry }, i) => (
+                  <>
+                    {i > 0 ? ' · ' : ''}
+                    <a href={`/${collectionOf[ref.kind]}/${ref.slug}`}>{labelOf(entry)}</a>
+                  </>
+                ))}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </article>
+</Base>
+
+<style>
+  .marginalia-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+  }
+  .m-item {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 1.4rem;
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--rule);
+  }
+  .m-item:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+  .m-date {
+    color: var(--rubric);
+    padding-top: 0.35rem;
+  }
+  .m-title {
+    font-size: 1.35rem;
+    font-weight: 500;
+    margin: 0 0 0.4rem;
+  }
+  .m-title a { text-decoration: none; color: var(--ink); }
+  .m-title a:hover { color: var(--rubric); }
+  .m-summary {
+    margin: 0 0 0.5rem;
+    color: var(--ink-soft);
+  }
+  .m-margin {
+    color: var(--ink-faint);
+    margin: 0;
+  }
+  .m-margin a { color: var(--ink-soft); text-decoration-color: var(--copper); }
+  @media (max-width: 640px) {
+    .m-item { grid-template-columns: 1fr; gap: 0.4rem; }
+  }
+</style>

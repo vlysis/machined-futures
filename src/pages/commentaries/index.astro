@@ -1,0 +1,89 @@
+---
+import Base from '~/layouts/Base.astro';
+import OrderChip from '~/components/OrderChip.astro';
+import { getCollection } from 'astro:content';
+
+const commentaries = (await getCollection('commentaries')).sort(
+  (a, b) => b.data.voice.date.getTime() - a.data.voice.date.getTime()
+);
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+---
+
+<Base
+  title="Commentaries"
+  description="Long-form essays — arguments made across Hands, in the voice of the Archivist or an Interlocutor."
+>
+  <article class="prose-wide">
+    <p class="entry-eyebrow"><span class="smallcaps-mono">The Archive · Commentary</span></p>
+    <h1 class="entry-title">Commentaries</h1>
+    <p>
+      Long-form essays &mdash; arguments made across the archive's
+      fiction rather than readings of any single Dossier. Commentaries
+      are the natural venue for the Archivist's own writing, and the
+      place where an Interlocutor's argument can be answered by another
+      voice. See the <a href="/colophon">Colophon</a> for how the
+      archive handles voices.
+    </p>
+
+    {commentaries.length === 0 ? (
+      <p class="empty">No commentaries yet.</p>
+    ) : (
+      <ol class="c-list">
+        {commentaries.map((c) => {
+          const role = c.data.voice.role;
+          const roleLabel = role === 'archivist' ? 'Archivist' : 'Interlocutor';
+          return (
+            <li>
+              <a href={`/commentaries/${c.slug}`} class="c-link">
+                <time class="c-date smallcaps-mono" datetime={c.data.voice.date.toISOString().slice(0, 10)}>
+                  {fmtDate(c.data.voice.date)}
+                </time>
+                <h2 class="c-title">{c.data.title}</h2>
+                {c.data.subtitle && <p class="c-sub">{c.data.subtitle}</p>}
+                <p class={`c-voice smallcaps-mono voice-role-${role}`}>
+                  By {c.data.voice.name}, {roleLabel}
+                </p>
+                <div class="c-orders">
+                  {c.data.orders.map((o) => <OrderChip order={o} />)}
+                </div>
+              </a>
+            </li>
+          );
+        })}
+      </ol>
+    )}
+  </article>
+</Base>
+
+<style>
+  .c-list { list-style: none; padding: 0; margin: 2rem 0 0; }
+  .c-list li { border-top: 1px solid var(--rule); }
+  .c-list li:last-child { border-bottom: 1px solid var(--rule); }
+  .c-link {
+    display: block;
+    padding: 1.6rem 0;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .c-link:hover .c-title { color: var(--rubric); }
+  .c-date { color: var(--rubric); }
+  .c-title {
+    font-size: 1.6rem;
+    font-weight: 500;
+    margin: 0.4rem 0 0.3rem;
+    transition: color 120ms ease;
+  }
+  .c-sub {
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 0 0 0.6rem;
+  }
+  .c-voice { margin: 0.2rem 0 0.6rem; color: var(--ink-faint); font-size: 0.82rem; }
+  .c-voice.voice-role-interlocutor { color: var(--copper); }
+  .c-voice.voice-role-archivist { color: var(--rubric); }
+  .c-orders { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .empty { color: var(--ink-faint); font-style: italic; }
+</style>
