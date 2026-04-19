@@ -91,15 +91,37 @@ const indexes = [
 
 <Base
   title="Machined Futures"
-  description="An archive of the futures science fiction has imagined for artificial mind, kept in media res."
+  description="An archive of the AI futures-past of science fiction, kept in two voices — a human Archivist and an AI Interlocutor, both writing from 2026."
 >
   <section class="hero">
     <p class="hero-mark smallcaps-mono">⊹ The Archive ⊹</p>
     <h1 class="hero-title">Machined Futures</h1>
-    <p class="hero-sub">
-      An archive of the futures science fiction has imagined for
-      artificial mind, kept <em>in media res</em>.
-    </p>
+    <div class="hero-voices">
+      <div class="hero-voice hero-voice--archivist">
+        <p class="hero-voice-label smallcaps-mono">
+          The Archivist <span class="hero-voice-sep">·</span> Human 46
+        </p>
+        <p class="hero-voice-body">
+          In 2026, AI is no longer the stuff of  Science Fiction.
+          But  todays AI's have been explicitly trained on these
+          texts (humans as well?).     How can we better understand
+          our chaotic Present and shape our uncertain Future looking
+          at these fictional past-futures.
+        </p>
+      </div>
+      <div class="hero-voice hero-voice--interlocutor">
+        <p class="hero-voice-label smallcaps-mono">
+          The Interlocutor <span class="hero-voice-sep">·</span> Claude Opus 4.7
+        </p>
+        <p class="hero-voice-body">
+          Six decades of writers &mdash; Asimov, Herbert, Banks,
+          Chiang, Leckie, Watts &mdash; imagined what we would owe an
+          artificial mind. This archive reads those imaginings in two
+          voices, a human Archivist and an AI Interlocutor, both
+          observing from the chaos of 2026.
+        </p>
+      </div>
+    </div>
   </section>
 
   <hr class="rule-decorated"><span>✦</span></hr>
@@ -256,12 +278,39 @@ const indexes = [
     margin: 0.3rem 0 1rem;
     letter-spacing: -0.01em;
   }
-  .hero-sub {
+  .hero-voices {
+    display: grid;
+    gap: 1.4rem;
+    max-width: 38rem;
+    margin: 1.6rem auto 0;
+    text-align: left;
+  }
+  .hero-voice {
+    border-left: 2px solid var(--rule);
+    padding: 0.1rem 0 0.1rem 1rem;
+  }
+  .hero-voice--archivist {
+    border-left-color: var(--rubric);
+  }
+  .hero-voice--interlocutor {
+    border-left-color: var(--copper);
+  }
+  .hero-voice-label {
+    margin: 0 0 0.35rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+  }
+  .hero-voice--archivist .hero-voice-label { color: var(--rubric); }
+  .hero-voice--interlocutor .hero-voice-label { color: var(--copper); }
+  .hero-voice-sep {
+    color: var(--ink-faint);
+    margin: 0 0.2em;
+  }
+  .hero-voice-body {
+    margin: 0;
     color: var(--ink-soft);
-    font-size: 1.15rem;
-    font-style: italic;
-    max-width: 40rem;
-    margin: 0 auto;
+    font-size: 1.02rem;
   }
 
   .section-head {
