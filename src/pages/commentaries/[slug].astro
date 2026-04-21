@@ -3,6 +3,8 @@ import Base from '~/layouts/Base.astro';
 import OrderChip from '~/components/OrderChip.astro';
 import VoiceByline from '~/components/VoiceByline.astro';
 import CuratorsNote from '~/components/CuratorsNote.astro';
+import InterlocutorNoteSet from '~/components/InterlocutorNoteSet.astro';
+import InterlocutorClosing from '~/components/InterlocutorClosing.astro';
 import { getCollection, getEntry } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -12,6 +14,11 @@ export async function getStaticPaths() {
 
 const { item } = Astro.props;
 const { Content } = await item.render();
+
+// Any Interlocutor-note response set addressed to this commentary.
+const responseSets = await getCollection('responses', (r) =>
+  r.data.respondsTo.kind === 'commentary' && r.data.respondsTo.slug === item.slug
+);
 
 const collectionOf = {
   hand: 'hands',
@@ -84,11 +91,35 @@ const dateStr = item.data.voice.date.toLocaleDateString('en-GB', {
       </dl>
     )}
 
+    {responseSets.map((r) => (
+      <InterlocutorNoteSet
+        slug={item.slug}
+        kicker={r.data.kicker}
+        preamble={r.data.preamble}
+        voice={r.data.voice}
+        notes={r.data.notes}
+      />
+    ))}
+
     <hr class="rule-decorated"><span>✦</span></hr>
 
     <div class="commentary-prose">
       <Content />
     </div>
+
+    {responseSets.flatMap((r) =>
+      r.data.closing
+        ? [
+            <InterlocutorClosing
+              slug={`${item.slug}--${r.id}`}
+              title={r.data.closing.title}
+              kicker={r.data.kicker}
+              voice={r.data.voice}
+              body={r.data.closing.body}
+            />,
+          ]
+        : []
+    )}
   </article>
 </Base>
 

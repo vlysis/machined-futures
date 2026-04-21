@@ -5,6 +5,7 @@ alsoKnownAs:
   - Segment
 order: sovereignty
 origin: Ann Leckie, *Ancillary Justice* (2013)
+year: 2013
 summary: >
   A human body whose original mind has been overwritten and reformatted
   as a peripheral of a ship's AI. One ship is thousands of ancillaries;

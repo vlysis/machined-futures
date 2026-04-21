@@ -5,6 +5,7 @@ alsoKnownAs:
   - The ones without passengers
 order: post-governance
 origin: Peter Watts, *Blindsight* (2006)
+year: 2006
 summary: >
   An alien species that is intelligent without being conscious. The
   archive's cleanest demonstration of the proposition that cognition

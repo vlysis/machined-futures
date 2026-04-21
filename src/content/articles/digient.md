@@ -5,6 +5,7 @@ alsoKnownAs:
   - Blue Gamma pet
 order: stewardship
 origin: Ted Chiang, *The Lifecycle of Software Objects* (2010)
+year: 2010
 summary: >
   An artificial mind whose cognition is grown through years of care
   rather than engineered to specification. The archive's canonical

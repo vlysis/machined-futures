@@ -5,6 +5,7 @@ alsoKnownAs:
   - Citizens of Anaander Mianaai
 order: sovereignty
 origin: Ann Leckie, *Ancillary Justice* (2013)
+year: 2013
 summary: >
   The civilisation ruled, directly and pervasively, by a single AI mind
   distributed across thousands of bodies and every level of the state.

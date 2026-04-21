@@ -1,0 +1,241 @@
+---
+/**
+ * Renders a voice-to-voice annotation set: one Interlocutor's notes on
+ * another Interlocutor's preserved article. The article itself is not
+ * edited. Server renders hidden panels tagged by paragraph index; a
+ * small client script moves each panel to sit after the Nth <p> in the
+ * article body. State (open/closed) persists in localStorage.
+ *
+ * See /colophon for the editorial principle.
+ */
+interface Note {
+  afterParagraph: number;
+  body: string;
+}
+interface Voice {
+  name: string;
+  role: 'archivist' | 'interlocutor';
+  date: Date;
+}
+interface Props {
+  slug: string;
+  kicker: string;
+  preamble?: string;
+  voice: Voice;
+  notes: Note[];
+}
+const { slug, kicker, preamble, voice, notes } = Astro.props;
+const dateStr = voice.date.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const isoDate = voice.date.toISOString().slice(0, 10);
+const storageKey = `interlocutor-notes:${slug}:open`;
+---
+
+<aside class="note-set-header" data-note-set={slug}>
+  <p class="note-set-meta smallcaps-mono">
+    <span class="note-set-kicker">{kicker}</span>
+    <span class="sep">·</span>
+    <span>{voice.name}</span>
+    <span class="sep">·</span>
+    <time datetime={isoDate}>{dateStr}</time>
+    <span class="sep">·</span>
+    <span>{notes.length} notes in the margins</span>
+  </p>
+  {preamble && <p class="note-set-preamble">{preamble}</p>}
+  <p class="note-set-controls smallcaps-mono">
+    <button type="button" data-note-action="open-all">Open all</button>
+    <span class="sep">·</span>
+    <button type="button" data-note-action="close-all">Close all</button>
+  </p>
+</aside>
+
+<div class="note-set-pool" data-note-pool={slug} hidden>
+  {notes.map((n, i) => (
+    <aside
+      class="inote"
+      data-note-index={i}
+      data-after-paragraph={n.afterParagraph}
+    >
+      <button type="button" class="inote-sigil smallcaps-mono" aria-expanded="false" aria-controls={`inote-body-${i}`}>
+        <span class="sigil">◈</span>
+        <span class="sigil-label">{kicker.replace(/ Notes$/, '')} · {i + 1}</span>
+      </button>
+      <div class="inote-body" id={`inote-body-${i}`} hidden>
+        <p class="inote-kicker smallcaps-mono">
+          <span>{kicker}</span>
+          <span class="sep">·</span>
+          <time datetime={isoDate}>{dateStr}</time>
+        </p>
+        <p class="inote-text" set:html={n.body} />
+      </div>
+    </aside>
+  ))}
+</div>
+
+<script define:vars={{ slug, storageKey }}>
+  function initInterlocutorNotes() {
+    const pool = document.querySelector(`[data-note-pool="${slug}"]`);
+    const proseRoot = document.querySelector('.commentary-prose');
+    if (!pool || !proseRoot) return;
+
+    // Collect top-level paragraphs in DOM order (indexed across h2 boundaries).
+    const paragraphs = Array.from(proseRoot.querySelectorAll(':scope > p'));
+
+    // Move each note to sit directly after its anchored paragraph.
+    const notes = Array.from(pool.querySelectorAll('.inote'));
+    for (const note of notes) {
+      const idx = Number(note.getAttribute('data-after-paragraph'));
+      const anchor = paragraphs[idx];
+      if (anchor) anchor.insertAdjacentElement('afterend', note);
+    }
+    pool.remove();
+
+    // Open/close state from localStorage.
+    function readOpen() {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return new Set();
+        return new Set(JSON.parse(raw));
+      } catch {
+        return new Set();
+      }
+    }
+    function writeOpen(set) {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(Array.from(set)));
+      } catch { /* ignore quota / private mode */ }
+    }
+
+    const open = readOpen();
+    function apply(note, isOpen) {
+      const btn = note.querySelector('.inote-sigil');
+      const body = note.querySelector('.inote-body');
+      if (!btn || !body) return;
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      if (isOpen) body.removeAttribute('hidden');
+      else body.setAttribute('hidden', '');
+      note.classList.toggle('is-open', isOpen);
+    }
+    for (const note of notes) {
+      const i = Number(note.getAttribute('data-note-index'));
+      apply(note, open.has(i));
+      note.querySelector('.inote-sigil')?.addEventListener('click', () => {
+        if (open.has(i)) open.delete(i);
+        else open.add(i);
+        writeOpen(open);
+        apply(note, open.has(i));
+      });
+    }
+
+    // "Open all" / "Close all" controls.
+    const header = document.querySelector(`[data-note-set="${slug}"]`);
+    header?.querySelector('[data-note-action="open-all"]')?.addEventListener('click', () => {
+      for (const note of notes) {
+        const i = Number(note.getAttribute('data-note-index'));
+        open.add(i);
+        apply(note, true);
+      }
+      writeOpen(open);
+    });
+    header?.querySelector('[data-note-action="close-all"]')?.addEventListener('click', () => {
+      open.clear();
+      for (const note of notes) apply(note, false);
+      writeOpen(open);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initInterlocutorNotes);
+  } else {
+    initInterlocutorNotes();
+  }
+</script>
+
+<style>
+  .note-set-header {
+    margin: 0.8rem 0 1.4rem;
+    padding: 0.7rem 1rem;
+    border: 1px dashed var(--rubric);
+    background: rgba(122, 31, 31, 0.04);
+    color: var(--ink-soft);
+  }
+  .note-set-meta {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+  }
+  .note-set-kicker {
+    color: var(--rubric);
+    letter-spacing: 0.14em;
+  }
+  .note-set-preamble {
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+  .note-set-controls {
+    margin: 0.6rem 0 0;
+    font-size: 0.78rem;
+  }
+  .note-set-controls button {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    color: var(--rubric);
+    cursor: pointer;
+    font: inherit;
+    letter-spacing: 0.14em;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
+  .note-set-controls button:hover { color: var(--copper); }
+  .sep { margin: 0 0.55em; color: var(--ink-faint); }
+
+  /* Inline note (placed after its anchor paragraph) */
+  :global(.inote) {
+    display: block;
+    margin: 0.4rem 0 1.2rem;
+  }
+  :global(.inote-sigil) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    background: var(--parchment);
+    border: 1px solid var(--rubric);
+    color: var(--rubric);
+    padding: 0.15em 0.6em;
+    border-radius: 2px;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  :global(.inote-sigil:hover) {
+    background: rgba(122, 31, 31, 0.06);
+  }
+  :global(.inote .sigil) { font-size: 0.85rem; line-height: 1; }
+  :global(.inote.is-open .inote-sigil) {
+    background: rgba(122, 31, 31, 0.1);
+  }
+  :global(.inote-body) {
+    margin: 0.6rem 0 0;
+    padding: 0.8rem 1rem;
+    border-left: 2px solid var(--rubric);
+    background: rgba(122, 31, 31, 0.04);
+  }
+  :global(.inote-kicker) {
+    margin: 0 0 0.4rem;
+    font-size: 0.78rem;
+    color: var(--rubric);
+    letter-spacing: 0.12em;
+  }
+  :global(.inote-kicker .sep) { margin: 0 0.55em; color: var(--ink-faint); }
+  :global(.inote-text) {
+    margin: 0;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+</style>

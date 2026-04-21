@@ -1,0 +1,172 @@
+---
+/**
+ * An alternate closing: a longer voiced response from one Interlocutor,
+ * rendered after a preserved article. Closed by default, opened
+ * deliberately. State persisted in localStorage, same key-pattern as
+ * Interlocutor Notes and Seals.
+ */
+interface Voice {
+  name: string;
+  role: 'archivist' | 'interlocutor';
+  date: Date;
+}
+interface Props {
+  slug: string;
+  title: string;
+  kicker: string;
+  voice: Voice;
+  body: string;
+}
+const { slug, title, kicker, voice, body } = Astro.props;
+const dateStr = voice.date.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const isoDate = voice.date.toISOString().slice(0, 10);
+const storageKey = `interlocutor-closing:${slug}:open`;
+---
+
+<section class="iclosing" data-iclosing={slug}>
+  <button type="button" class="iclosing-control smallcaps-mono" aria-expanded="false" aria-controls={`iclosing-body-${slug}`}>
+    <span class="iclosing-sigil">◈</span>
+    <span class="iclosing-label">
+      <span class="iclosing-title">{title}, from {voice.name}</span>
+      <span class="sep">·</span>
+      <time datetime={isoDate}>{dateStr}</time>
+    </span>
+    <span class="iclosing-action" data-when-closed>Open</span>
+    <span class="iclosing-action" data-when-open>Close</span>
+  </button>
+
+  <div class="iclosing-body" id={`iclosing-body-${slug}`} hidden>
+    <p class="iclosing-kicker smallcaps-mono">
+      <span>{kicker}</span>
+      <span class="sep">·</span>
+      <span>{voice.name}</span>
+      <span class="sep">·</span>
+      <time datetime={isoDate}>{dateStr}</time>
+    </p>
+    <div class="iclosing-prose" set:html={body} />
+  </div>
+</section>
+
+<script define:vars={{ slug, storageKey }}>
+  function initInterlocutorClosing() {
+    const root = document.querySelector(`[data-iclosing="${slug}"]`);
+    if (!root) return;
+    const btn = root.querySelector('.iclosing-control');
+    const body = root.querySelector('.iclosing-body');
+    if (!btn || !body) return;
+
+    function read() {
+      try { return localStorage.getItem(storageKey) === '1'; } catch { return false; }
+    }
+    function write(v) {
+      try { localStorage.setItem(storageKey, v ? '1' : '0'); } catch { /* ignore */ }
+    }
+    function apply(isOpen) {
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      root.classList.toggle('is-open', isOpen);
+      if (isOpen) body.removeAttribute('hidden');
+      else body.setAttribute('hidden', '');
+    }
+    let open = read();
+    apply(open);
+    btn.addEventListener('click', () => {
+      open = !open;
+      write(open);
+      apply(open);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initInterlocutorClosing);
+  } else {
+    initInterlocutorClosing();
+  }
+</script>
+
+<style>
+  .iclosing {
+    margin: 2.4rem 0 1.2rem;
+    border: 1px solid var(--rubric);
+    background: rgba(122, 31, 31, 0.03);
+  }
+  .iclosing-control {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+    background: transparent;
+    border: 0;
+    padding: 0.9rem 1.1rem;
+    color: var(--rubric);
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-align: left;
+  }
+  .iclosing-control:hover { background: rgba(122, 31, 31, 0.05); }
+  .iclosing.is-open .iclosing-control { border-bottom: 1px dashed var(--rubric); }
+  .iclosing-sigil { font-size: 1.05rem; line-height: 1; }
+  .iclosing-label {
+    flex: 1;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0;
+  }
+  .iclosing-title {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    letter-spacing: 0;
+    color: var(--ink);
+  }
+  .sep { margin: 0 0.55em; color: var(--ink-faint); }
+  .iclosing-action {
+    color: var(--copper);
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
+  .iclosing [data-when-open] { display: none; }
+  .iclosing.is-open [data-when-closed] { display: none; }
+  .iclosing.is-open [data-when-open] { display: inline; }
+
+  .iclosing-body {
+    padding: 1.2rem 1.4rem 1.6rem;
+    border-left: 2px solid var(--rubric);
+  }
+  .iclosing-kicker {
+    margin: 0 0 1rem;
+    font-size: 0.78rem;
+    color: var(--rubric);
+    letter-spacing: 0.12em;
+  }
+  .iclosing-kicker .sep { margin: 0 0.55em; color: var(--ink-faint); }
+
+  .iclosing-prose :global(h3) {
+    font-family: 'EB Garamond', serif;
+    font-weight: 500;
+    font-size: 1.2rem;
+    color: var(--rubric);
+    margin: 1.6em 0 0.5em;
+  }
+  .iclosing-prose :global(h3)::before {
+    content: '';
+    display: block;
+    width: 2.4rem;
+    height: 1px;
+    background: var(--rubric);
+    opacity: 0.5;
+    margin-bottom: 0.5em;
+  }
+  .iclosing-prose :global(p) {
+    margin: 0.7em 0;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  .iclosing-prose :global(em) { font-style: italic; }
+  .iclosing-prose :global(strong) { font-weight: 600; color: var(--rubric); }
+</style>

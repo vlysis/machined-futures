@@ -5,6 +5,7 @@ alsoKnownAs:
   - Syntactic competence without semantic grasp
 order: post-governance
 origin: John Searle, *Minds, Brains, and Programs* (1980); invoked throughout Peter Watts, *Blindsight* (2006)
+year: 1980
 summary: >
   A philosopher's thought experiment proposing a system that perfectly
   answers questions in a language it does not understand. In Watts's

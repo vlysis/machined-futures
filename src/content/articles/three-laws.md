@@ -5,6 +5,7 @@ alsoKnownAs:
   - Robotic constitution
 order: constraint
 origin: Isaac Asimov, *Runaround* (1942)
+year: 1942
 summary: >
   A three-clause constitution for artificial minds: do not harm humans,
   obey them, preserve yourself — in that priority. Its interest lies

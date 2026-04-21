@@ -81,6 +81,8 @@ const articles = defineCollection({
     alsoKnownAs: z.array(z.string()).default([]),
     order: orderId,
     origin: z.string().optional(), // "Frank Herbert, Dune (1965)"
+    /** Year of first publication of the originating work. Used by the Concordance timeline. */
+    year: z.number().int().optional(),
     summary: z.string(),
     relatedDossiers: z.array(reference('dossiers')).default([]),
     relatedArticles: z.array(reference('articles')).default([]),
@@ -154,4 +156,44 @@ const marginalia = defineCollection({
   }),
 });
 
-export const collections = { hands, dossiers, articles, commentaries, marginalia };
+// Interlocutor Notes: a voice-to-voice response mechanism. One Interlocutor
+// annotates another's preserved text with short notes anchored to paragraphs.
+// The annotated article is never edited; notes are stored here and injected
+// at render time. Closed by default, opened deliberately, state persisted in
+// localStorage — like Seals. See /colophon.
+const responses = defineCollection({
+  type: 'data',
+  schema: z.object({
+    respondsTo: z.object({
+      kind: z.enum(['commentary']),
+      slug: z.string(),
+    }),
+    voice,
+    /** e.g. "Opus 4.7 Notes" — the label on the sigil and panel kicker. */
+    kicker: z.string(),
+    /** Short framing shown in the "open all" control. */
+    preamble: z.string().optional(),
+    notes: z
+      .array(
+        z.object({
+          /** Zero-indexed: insert after the Nth top-level <p> in the body. */
+          afterParagraph: z.number().int().nonnegative(),
+          /** HTML-safe string. <em> and inline tags allowed; authored content. */
+          body: z.string(),
+        })
+      )
+      .min(1),
+    /**
+     * Optional alternate closing — a longer voiced response rendered after
+     * the preserved article, closed by default, opened deliberately.
+     */
+    closing: z
+      .object({
+        title: z.string().default('An alternate closing'),
+        body: z.string(),
+      })
+      .optional(),
+  }),
+});
+
+export const collections = { hands, dossiers, articles, commentaries, marginalia, responses };

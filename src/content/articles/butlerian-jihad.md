@@ -5,6 +5,7 @@ alsoKnownAs:
   - The war against thinking machines
 order: prohibition
 origin: Frank Herbert, *Dune* (1965)
+year: 1965
 summary: >
   The off-page war that produced Dune's universe by banning artificial
   intelligence outright. Its commandment — *thou shalt not make a

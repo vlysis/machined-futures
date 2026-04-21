@@ -6,6 +6,7 @@ alsoKnownAs:
   - GSV Mind
 order: partnership
 origin: Iain M. Banks, *Consider Phlebas* (1987) and the Culture sequence
+year: 1987
 summary: >
   A hyperintelligent artificial mind, embodied as a ship, orbital, or
   station, that both inhabits and governs the Culture's infrastructure.
